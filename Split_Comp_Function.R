@@ -6,21 +6,10 @@ splitcomp<-function(deq,splt)
   #splt is split dataset
   
   require(dplyr)
-  
-  #let's get the extra columns out, causing issues
-deq<-subset(deq,select=c("OrganizationID","Project1","MLocID","act_id","Activity_Type",
-                         "SampleStartDate","SampleStartTime","Char_Name",
-                         "Char_Speciation","Sample_Fraction","CASNumber","Result_status","Result_Type","Result","Result_Numeric",
-                         "Result_Operator","Result_Unit","Method_Code","Method_Context",
-                         "Activity_Comment","Result_Comment","lab_Comments","QualifierAbbr","QualifierTxt","MDLType","MDLValue","MDLUnit",
-                         "MRLType","MRLValue","MRLUnit"))
-splt<-subset(splt,select=c("OrganizationID","Project1","MLocID","act_id","Activity_Type",
-                          "SampleStartDate","SampleStartTime","Char_Name",
-                          "Char_Speciation","Sample_Fraction","CASNumber","Result_status","Result_Type","Result","Result_Numeric",
-                          "Result_Operator","Result_Unit","Method_Code","Method_Context",
-                          "Activity_Comment","Result_Comment","lab_Comments","QualifierAbbr","QualifierTxt","MDLType","MDLValue","MDLUnit",
-                          "MRLType","MRLValue","MRLUnit"))
+  source("E:/Permit Job/R_Scripts/ShinyNPDES_AWQMS/NameandFraction.R")
 
+  
+#####UNITS
 #convert units so they match DEQ's data (NOTE: THIS NEEDS MORE TESTING TO MAKE SURE THE CODE WORKS PROPERLY)
 #get the units associated with the characteristics for deq and split data
 dequnit<-subset(deq,select=c("Char_Name","Result_Unit"))
@@ -42,8 +31,14 @@ if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,"mg/l","ug/l")}
 if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
   
 
+###JOIN DEQ AND SPLIT DATA
+#use namfrac function to get fraction as part of name for Metals 
+#(if we just use sample fraction as part of the join we might miss some characteristics that were uploaded with different sample fractions
+#where sample fraction doesn't matter (e.g. Dichlorodifluoromethane has been uploaded in AWQMS under Volatile and Extractable sample fractions))
+deq<-namefrac(deq)
+splt<-namefrac(splt)
   #need to join datasets on an inner join
-  jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Sample_Fraction","Activity_Type"),suffix=c(".deq",".split"))
+  jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
   
 
 
@@ -57,7 +52,7 @@ if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
 
   #calculate RPD
   jn$splitRPD<- case_when(jn$qctype=="RPD"~ 
-                            (abs(jn$Result_Numeric.deq-jn$Result_Numeric.split)/mean(c(jn$Result_Numeric.deq,jn$Result_Numeric.split))*100)
+                            (abs(jn$Result_Numeric.deq-jn$Result_Numeric.split)/((jn$Result_Numeric.deq+jn$Result_Numeric.split)/2)*100)
                           )
     
   #Calculate difference for Diff and Micro don't always get MRL from split lab, use ours to be safe 
@@ -80,7 +75,7 @@ if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
   
   #need to return table of important columns
   jn<-subset(jn,select=c("MLocID","Activity_Type","SampleStartDate","SampleStartTime.deq","Char_Name",
-                         "Char_Speciation.deq","Sample_Fraction","Result_status.deq","Result_status.split",
+                         "Char_Speciation.deq","Result_status.deq","Result_status.split",
                          "Result_Type.deq","Result_Type.split","Result.deq","Result.split",
                          "Result_Unit.deq","Result_Unit.split","Method_Code.deq","Method_Code.split",
                          "Activity_Comment.deq","Result_Comment.deq","lab_Comments.deq",
@@ -101,12 +96,14 @@ if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
 
 #test dataset
 library(AWQMSdata)
-dat<-AWQMS_Data(startdate='2018-05-01',enddate='2018-05-03',project='Landfill Monitoring',org=c('OREGONDEQ','RVBND_LF(NOSTORETID)'))
-deq<-subset(dat,OrganizationID=='OREGONDEQ')
-rvb<-subset(dat,OrganizationID=='RVBND_LF(NOSTORETID)')
+#dat<-AWQMS_Data(startdate='2018-05-01',enddate='2018-05-03',project='Landfill Monitoring',org=c('OREGONDEQ','RVBND_LF(NOSTORETID)'))
+#deq<-subset(dat,OrganizationID=='OREGONDEQ')
+#rvb<-subset(dat,OrganizationID=='RVBND_LF(NOSTORETID)')
 
-test<-splitcomp(deq,rvb)
+#test<-splitcomp(deq,rvb)
 
-
+#nomatch<-full_join(deq,rvb,by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split") )
+#nomatch<-subset(nomatch, is.na(OrganizationID.split)|is.na(OrganizationID.deq))
+#nomatch<-subset(nomatch,select=c("OrganizationID.split","OrganizationID.deq",'MLocID',"SampleStartDate","Char_Name","Activity_Type"))
 
 

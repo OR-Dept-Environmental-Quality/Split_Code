@@ -1,0 +1,35 @@
+---
+params:
+  data: NA
+  split: NA
+
+output: pdf_document
+header-includes:
+  \usepackage{booktabs}
+  \usepackage{float}
+  \usepackage{longtable}
+  \usepackage{array}
+---
+##State of Oregon Department of Environmental Quality     Memorandum
+#`r paste("To: ", PERSONS)
+# From: Aliana Britson 
+
+#`r paste("Analytical Split Report \n", SPLIT ORGANIZATION, "\n DEQ Laboratory Work Order(s) " WORK ORDERS)` 
+##`r paste("Dates: ")`
+
+
+```{r setup-packages-functions, include=FALSE}
+library(knitr)
+
+#including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
+#included packages in YAML header to fix problem
+library(kableExtra)
+library(tinytex)
+```
+
+```{r}
+# need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars)
+
+#need full split report
+
+```

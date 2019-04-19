@@ -8,6 +8,8 @@ print("Initial data queries may take a few minutes.")
 library(shiny)
 library(AWQMSdata)
 library(shinybusy)
+library(openxlsx)
+source("Split_Comp_Function.R")
 
 #attempt to turn off scientific notation
 options(scipen=999)
@@ -102,7 +104,8 @@ ui<-fluidPage(
         #Split org data
         tabPanel("Split Organization Data",dataTableOutput("orgData")),
         #Comparison
-        tabPanel("Split Comparison",dataTableOutput("splitData"))
+        tabPanel("Split Comparison",dataTableOutput("splitData")),
+        tabPanel("Non Matching Data",dataTableOutput("nomatchdeq"))
       )
     )
   ),
@@ -161,9 +164,88 @@ ui<-fluidPage(
                         Result,Result_Operator,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
                         Result_Comment,lab_Comments,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
     })
-  }
+
 
   #split comparison
+  splitData<-eventReactive(input$goButton,{
+    splitdat<-splitcomp(deq=deqData(),splt=orgData())
+    splitdat
+  })
+  
+  output$splitData<-renderDataTable({splitData()})
+  
+  #create tables of nonmatching data
+  
+  nomatch<-eventReactive(input$goButton,{
+    nomatch<-full_join(deqData(),orgData(),by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+    nomatch<-subset(nomatch, is.na(OrganizationID.split)|is.na(OrganizationID.deq))
+    nomatch<-subset(nomatch,select=c("OrganizationID.deq","OrganizationID.split",'MLocID',"SampleStartDate","Char_Name","Activity_Type"))
+    nomatch
+  })
+
+  output$nomatchdeq<-renderDataTable({nomatch()})
+  
+  #generate workbook to download
+  dwnld<-eventReactive(input$goButton,{
+    wb<-createWorkbook()
+    
+    #all data
+    addWorksheet(wb,"All Data")
+    writeDataTable(wb,"All Data",x=data(),tableStyle="none")
+    #DEQ data
+    addWorksheet(wb,"DEQ Data")
+    writeDataTable(wb,"DEQ Data",x=deqData(),tableStyle="none")
+    #split data
+    addWorksheet(wb,"Split Data")
+    writeDataTable(wb,"Split Data",x=orgData(),tableStyle="none")
+    #comparsion
+    addWorksheet(wb,"Comparison")
+    writeDataTable(wb,"Comparison",x=splitData(),tableStyle="none")
+    #nonmatching
+    addWorksheet(wb,"Non Match")
+    writeDataTable(wb,"Non Match",x=nomatch(),tableStyle="none")
+    
+    wb
+  })
+  
+  # Download button- only works in Chrome
+  # gives an excel workbook with multiple sheets
+  #set to give NAs as blank cells
+  output$downloadData <- downloadHandler(
+    
+    filename = function() {paste("Landfill_Split_",input$orgs,"_",Sys.Date(),".xlsx", sep="")},
+    content = function(file) {
+      #sheet with query parameters
+      saveWorkbook(dwnld(),file)
+    })
+  
+  #R markdown report
+  output$report<-downloadHandler(
+    filename = function() {paste(input$org,"_", Sys.Date() ,"_SplitReport.pdf", sep="")},
+    content=function(file){
+      
+      #create a file in a temporary directory
+      tempReport<-file.path(tempdir(),"SplitReport_Rmarkdown.Rmd")
+      #copy our report to the temporary directory file
+      file.copy("SplitReport_Rmarkdown.Rmd",tempReport,overwrite=TRUE)
+      
+      #create list of characteristics
+      #set up parameters to pass to our Rmd document
+      params<-list(data=data(),
+                   split=splitData(),
+                   org=orgData()
+)
+      
+      rmarkdown::render(tempReport, output_file=file,
+                        params=params,
+                        clean=TRUE,
+                        envir=new.env(parent= globalenv())
+                        
+      )
+    }
+  )
+  
+  }
   
   
   #run application
