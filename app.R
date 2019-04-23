@@ -9,6 +9,7 @@ library(shiny)
 library(AWQMSdata)
 library(shinybusy)
 library(openxlsx)
+library(dplyr)
 source("Split_Comp_Function.R")
 
 #attempt to turn off scientific notation
