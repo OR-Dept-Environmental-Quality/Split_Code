@@ -45,7 +45,7 @@ splt<-namefrac(splt)
   #need to add a column to determine what type of QC is needed (eg. RPA, Diff, Microdiff)
   #difference is done when data is less than 5x MRL. don't always get MRL from split lab, use ours to be safe
   jn$qctype<-case_when(jn$Char_Name==c("pH")|jn$Result_Numeric.deq<=(5*jn$MRLValue.deq)|jn$Result_Numeric.split<=(5*jn$MRLValue.deq)~"Diff",
-                       jn$Char_Name==c("Enterococcus","Escherichia coli","Fecal Coliform","Total Coliform")~"Micro",
+                       jn$Char_Name=="Enterococcus"|jn$Char_Name=="Escherichia coli"|jn$Char_Name=="Fecal Coliform"|jn$Char_Name=="Total Coliform"~"Micro",
                        jn$Result_Numeric.deq>(5*jn$MRLValue.deq)& jn$Result_Numeric.split>(5*jn$MRLValue.deq) ~"RPD"
                        )
                        
