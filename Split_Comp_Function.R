@@ -70,7 +70,9 @@ splt<-namefrac(splt)
                              ~abs(log10(jn$Result_Numeric.split)-log10(jn$MRLValue.deq))
                            )
                            
-  
+  #round RPD and Diff
+  jn$splitDiff<-round(jn$splitDiff,digits=2)
+  jn$splitRPD<-round(jn$splitRPD,digits=2)
   
   
   #need to return table of important columns
