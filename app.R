@@ -234,7 +234,8 @@ ui<-fluidPage(
       #set up parameters to pass to our Rmd document
       params<-list(data=data(),
                    split=splitData(),
-                   org=orgData()
+                   org=orgData(),
+                   deq=deqData()
 )
       
       rmarkdown::render(tempReport, output_file=file,
