@@ -1,7 +1,9 @@
 ---
 params:
   data: NA
+  deq: NA
   split: NA
+  org: NA
 
 output: pdf_document
 header-includes:
@@ -9,17 +11,29 @@ header-includes:
   \usepackage{float}
   \usepackage{longtable}
   \usepackage{array}
+  \usepackage{multirow}
 ---
-##State of Oregon Department of Environmental Quality     Memorandum
-#`r paste("To: ", PERSONS)
-# From: Aliana Britson 
+``` {r echo=FALSE}
+spltorg<-params$org
+spltorgnm<-unique(spltorg$Org_Name)
+dates<-sort(unique(spltorg$SampleStartDate))
+#dates<-list(dates)
 
-#`r paste("Analytical Split Report \n", SPLIT ORGANIZATION, "\n DEQ Laboratory Work Order(s) " WORK ORDERS)` 
-##`r paste("Dates: ")`
+```
+# State of Oregon Department of Environmental Quality 
+
+# Memorandum
+
+## `r paste("To: ")`
+## From: Aliana Britson 
+
+# `r paste("Analytical Split Report For", spltorgnm)` 
+## `r paste(dates)`
 
 
 ```{r setup-packages-functions, include=FALSE}
 library(knitr)
+library(tidyverse)
 
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
@@ -27,9 +41,54 @@ library(kableExtra)
 library(tinytex)
 ```
 
-```{r}
-# need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars)
+```{r echo=FALSE, results='asis'}
+options(knitr.kable.NA='')
+# need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
+deqdat<-params$data
 
+meta<-unique(subset(deqdat,select=c(MLocID,StationDes,SampleStartDate,SampleStartTime)))
+
+kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
+        kable_styling(latex_option="HOLD_position")
+```
+# Split Sample Report
+
+```{r echo=FALSE, results='asis'}
 #need full split report
+spltcomp<-params$split
 
+#get subset of columns, combine characteristic name ans speciation
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff))%>%
+  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+
+#this table is huge and unwieldy, try splitting it down by station/date/time
+lstsplt<-split(spltrp,spltrp$MLocID)
+
+for (i in 1:length(lstsplt)){
+  #get station, date, and time as variables so we can put them in the table name
+  station<-unique(lstsplt[[i]]$MLocID)
+  date<-unique(lstsplt[[i]]$SampleStartDate)
+  time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+  
+  #remove station, date, and time columns
+  lstsplt[[i]]$MLocID<-NULL
+  lstsplt[[i]]$SampleStartDate<-NULL
+  lstsplt[[i]]$SampleStartTime.deq<-NULL
+  
+  
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff"),
+            caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_option="HOLD_position")%>%
+        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
+        row_spec(which(lstsplt[[i]]$splitRPD>30),bold=TRUE) %>%
+        row_spec(which(lstsplt[[i]]$splitDiff>(2*lstsplt[[i]]$MRLValue.deq) &            (lstsplt[[i]]$Char_Name!="pH"|lstsplt[[i]]$Char_Name!="Enterococcus"|lstsplt[[i]]$Char_Name!="Escherichia coli"|lstsplt[[i]]$Char_Name!="Fecal Coliform"|lstsplt[[i]]$Char_Name!="Total Coliform")),bold=TRUE)%>%
+          row_spec(which(lstsplt[[i]]$splitDiff>0.5 & lstsplt[[i]]$Char_Name=="pH"),bold=TRUE)%>%
+            row_spec(which(lstsplt[[i]]$splitDiff>0.6 &            (lstsplt[[i]]$Char_Name=="Enterococcus"|lstsplt[[i]]$Char_Name=="Escherichia coli"|lstsplt[[i]]$Char_Name=="Fecal Coliform"|lstsplt[[i]]$Char_Name=="Total Coliform")),bold=TRUE)%>%
+        column_spec(1,width="10em")%>%
+        column_spec(5:6,width="3em")
+        )
+}
 ```
