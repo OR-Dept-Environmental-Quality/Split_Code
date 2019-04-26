@@ -92,3 +92,30 @@ for (i in 1:length(lstsplt)){
         )
 }
 ```
+
+# Data issues
+```{r echo=FALSE, results='asis'}
+#get a table of all the comments
+issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(lab_Comments.deq)|!is.na(Activity_Comment.split)
+                          |!is.na(Result_Comment.split)|!is.na(lab_Comments.split),
+               select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Activity_Comment.deq,
+                                 Result_Comment.deq,lab_Comments.deq,Activity_Comment.split,Result_Comment.split,lab_Comments.split)) %>%
+               mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
+               select(-Char_Speciation.deq)
+#combine all comments into one row for deq and for split lab
+#need to fix NA issue
+issues$Comment.deq<-paste(issues$Activity_Comment.deq,issues$Result_Comment.deq,issues$lab_Comments.deq)
+issues$Comment.split<-paste(issues$Activity_Comment.split,issues$Result_Comment.split,issues$lab_Comments.split)
+
+#select certain columns
+issues<-subset(issues,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.deq,Comment.split))
+
+names(issues)<-c("Station","Date","Time","Analyte","DEQ Lab Comments","Split Lab Comments")
+
+#big table, still needs work. Maybe split into two (deq vs split lab) or by site?
+kable(issues,format='latex',caption="Data Issues",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_option="HOLD_position")%>%
+        column_spec(1:4,width="6em")%>%
+        column_spec(5:6,width="15em")
+
+```
