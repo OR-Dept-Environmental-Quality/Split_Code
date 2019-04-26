@@ -47,12 +47,6 @@ ui<-fluidPage(
   #sidebar with parameter inputs
   sidebarLayout(
     sidebarPanel(
-      #Split entity
-      textInput("org",
-                label="Split Organization"),
-      #add line
-      tags$hr(),
-      
       # Start Date (make start date six months ago)
       dateInput("startd",
                 label = "Select Start Date",
@@ -178,8 +172,14 @@ ui<-fluidPage(
   #create tables of nonmatching data
   
   nomatch<-eventReactive(input$goButton,{
-    nomatch<-full_join(deqData(),orgData(),by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+    #combine name and fraction for deq and split data for better comparison
+    deq<-namefrac(deqData())
+    org<-namefrac(orgData())
+      #do a full join to get everything together
+    nomatch<-full_join(deq,org,by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+    #pull out the rows that don't have a match
     nomatch<-subset(nomatch, is.na(OrganizationID.split)|is.na(OrganizationID.deq))
+    #just get a few rows we want
     nomatch<-subset(nomatch,select=c("OrganizationID.deq","OrganizationID.split",'MLocID',"SampleStartDate","Char_Name","Activity_Type"))
     nomatch
   })
