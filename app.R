@@ -75,7 +75,7 @@ ui<-fluidPage(
                      choices = station,
                      multiple = TRUE), 
       
-      #add action button, idea is to not run query until the button is clicked)
+      #add action button, idea is to not run query until the button is clicked, otherwise it tries to query all AWQMS data at once and crashes
       actionButton("goButton","Run Query"),
       #add an excel download button
       downloadButton('downloadData', 'Download Data'),
@@ -100,6 +100,7 @@ ui<-fluidPage(
         tabPanel("Split Organization Data",dataTableOutput("orgData")),
         #Comparison
         tabPanel("Split Comparison",dataTableOutput("splitData")),
+        #table of non matching analytes
         tabPanel("Non Matching Data",dataTableOutput("nomatchdeq"))
       )
     )
