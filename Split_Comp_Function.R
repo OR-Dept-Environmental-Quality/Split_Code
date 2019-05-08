@@ -19,7 +19,7 @@ spltunit<-unique(spltunit)
 
 #join deq units and split units together, only keep characteristics where units do not agree
 unjn<-inner_join(dequnit,spltunit,by=c("Char_Name"),suffix=c(".deq",".splt"))
-unjn<-subset(unjn, unjn$Result_Unit.split!=unjn$Result_Unit.deq)
+unjn<-subset(unjn, unjn$Result_Unit.splt!=unjn$Result_Unit.deq)
 
 #get characteristics where we need to convert from mg to ug and also from ug to mg 
 #(the most likely units conversions needed, will add more as necessary)
@@ -73,6 +73,7 @@ splt<-namefrac(splt)
   #round RPD and Diff
   jn$splitDiff<-round(jn$splitDiff,digits=2)
   jn$splitRPD<-round(jn$splitRPD,digits=2)
+  
   
   
   #need to return table of important columns
