@@ -4,33 +4,25 @@ params:
   deq: NA
   split: NA
   org: NA
+  perm: NA
+  rep: NA
+  comp: NA
+  conc: NA
 
-output: pdf_document
+encoding: utf-8
+output:
+  pdf_document
 header-includes:
   \usepackage{booktabs}
   \usepackage{float}
   \usepackage{longtable}
   \usepackage{array}
   \usepackage{multirow}
+  \usepackage[table]{xcolor}
+  \let\oldrule=\rule
+  \renewcommand{\rule}[1]{\oldrule{\linewidth}}
+
 ---
-``` {r echo=FALSE}
-spltorg<-params$org
-spltorgnm<-unique(spltorg$Org_Name)
-dates<-sort(unique(spltorg$SampleStartDate))
-#dates<-list(dates)
-
-```
-# State of Oregon Department of Environmental Quality 
-
-# Memorandum
-
-## `r paste("To: ")`
-## From: Aliana Britson 
-
-# `r paste("Analytical Split Report For", spltorgnm)` 
-## `r paste(dates)`
-
-
 ```{r setup-packages-functions, include=FALSE}
 library(knitr)
 library(tidyverse)
@@ -41,16 +33,102 @@ library(kableExtra)
 library(tinytex)
 ```
 
+```{r echo=FALSE}
+#get organization name, lab used, sample dates
+spltorg<-params$org
+spltorgnm<-unique(spltorg$Org_Name)
+spltlabnm<-unique(spltorg$Analytical_Lab)
+dates<-sort(unique(spltorg$SampleStartDate))
+#reformat date
+dates<-format(dates,format="%m-%d-%Y")
+
+#DEQ sampling event number (the first 7 digits of the activity id)
+deqorg<-params$deq
+wrkrdr<-unique(substr(deqorg$act_id,1,7))
+```
+
+
+```{r logo, echo=FALSE,fig.align='left', out.width="400px",out.height="200px"}
+knitr::include_graphics("E:/R/Split_Code/DEQ-logo-color-notransp-horiz750x156.png")
+#
+```
+
+# Memorandum 
+
+## `r paste("To: ",params$rep)`
+## From: Aliana Britson 
+
+# `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)` 
+# `r paste("DEQ Sampling Event: ", wrkrdr)`
+## Date(s): `r paste(dates)`
+***
+
+This report compares the analytical results between Oregon DEQ and `r spltlabnm` for `r spltorgnm` performed on the dates and locations outlined in Table 1. 
+
+
 ```{r echo=FALSE, results='asis'}
+
 options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
-deqdat<-params$data
+deqdat<-params$deq
 
 meta<-unique(subset(deqdat,select=c(MLocID,StationDes,SampleStartDate,SampleStartTime)))
+#reformat date
+meta$SampleStartDate<-format(meta$SampleStartDate,format="%m-%d-%Y")
 
 kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
-        kable_styling(latex_option="HOLD_position")
+        kable_styling(latex_options=c("HOLD_position","striped"))
 ```
+# Review of Laboratory QA/QC Data
+
+``` {r echo=FALSE, results='asis'}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "supplied level II (Results and data QA/QC) reports from",spltlabnm,
+" laboratory which have been reviewed carefully for completeness, precision and accuracy. The quality control
+elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
+Control Sample for most analysis.
+
+Method Blank (MB): Analyte concentrations in blank samples should fall below the laboratory's reporting
+limit or be less than 10% of the lowest reported concentration in the sample batch.
+
+Laboratory Control Sample (LCS): A laboratory control sample (LCS) consisting of a controlled/known
+concentration should be analyzed and pass the appropriate QC limits for all analytes. These samples are used to
+assess the overall method performance and are the primary indicator of laboratory performance.
+
+Matrix Spike (MS): A Matrix Spike should be completed with each sample batch to indicate the presence of
+possible interferences. The MS results are examined to evaluate the impact of matrix effects on the
+environmental sample that was spiked.
+
+Duplicates (DUP): Laboratory replicates should be analyzed with each analytical batch and fall within the
+laboratory's QC limits. Analytical duplicates would be evaluated for consistency/comparability in analytical
+results. A Laboratory Control Sample Duplicate (LCSD) or Matrix Spike Duplicate (MSD) may be used to meet
+this criterion.")}
+
+if(unique(spltorg$Project1)=="Effluent Monitoring") {cat("The Split Sample Quality Assurance report compares laboratory measurements using different analytical methods and/or laboratories.
+The laboratory measurements are compared by one of two methods based on the samples' concentrations relative to the laboratory
+Method Reporting Limit (MRL) for that analyte.
+
+Difference: When one or both of the duplicates are less than five times the MRL, the values are compared by difference. The results are
+acceptable when the difference between the samples is less than twice the MRL.
+
+RPD: When both of the duplicate samples are greater than or equal to five times the MRL, the values are compared using the relative
+percent difference between the samples. The RPD is determined as the difference between the samples divided by the average of the
+values. Acceptable field duplicates have an absolute RPD of 20% or less.
+
+Microbiology parameters are always compared by difference. However, the bacteria counts are transformed to log values prior to
+calculation of the difference. Microbiology parameters are acceptable when the absolute difference of the log values is less than 0.6.")}
+```
+
+# Summary
+
+## *Comparison*
+
+`r params$comp`
+
+## *Conclusion*
+
+`r params$conc`
+
 # Split Sample Report
 
 ```{r echo=FALSE, results='asis'}
@@ -63,6 +141,12 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
+#reformat date
+spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
+spltrp<-spltrp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))
 
 #this table is huge and unwieldy, try splitting it down by station/date/time
 lstsplt<-split(spltrp,spltrp$MLocID)
@@ -78,44 +162,74 @@ for (i in 1:length(lstsplt)){
   lstsplt[[i]]$SampleStartDate<-NULL
   lstsplt[[i]]$SampleStartTime.deq<-NULL
   
+  #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
+  #so we create MRLNum variable to use and then hide the column later
+  lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
+  lstsplt[[i]]$MRLNum<-lstsplt[[i]]$MRLValue.deq
+  lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
   
-  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff"),
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Num"),
             caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_option="HOLD_position")%>%
+        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
         row_spec(which(lstsplt[[i]]$splitRPD>30),bold=TRUE) %>%
-        row_spec(which(lstsplt[[i]]$splitDiff>(2*lstsplt[[i]]$MRLValue.deq) &            (lstsplt[[i]]$Char_Name!="pH"|lstsplt[[i]]$Char_Name!="Enterococcus"|lstsplt[[i]]$Char_Name!="Escherichia coli"|lstsplt[[i]]$Char_Name!="Fecal Coliform"|lstsplt[[i]]$Char_Name!="Total Coliform")),bold=TRUE)%>%
+        row_spec(which(lstsplt[[i]]$splitDiff>(2*lstsplt[[i]]$MRLNum) &            (lstsplt[[i]]$Char_Name!="pH"|lstsplt[[i]]$Char_Name!="Enterococcus"|lstsplt[[i]]$Char_Name!="Escherichia coli"|lstsplt[[i]]$Char_Name!="Fecal Coliform"|lstsplt[[i]]$Char_Name!="Total Coliform")),bold=TRUE)%>%
           row_spec(which(lstsplt[[i]]$splitDiff>0.5 & lstsplt[[i]]$Char_Name=="pH"),bold=TRUE)%>%
             row_spec(which(lstsplt[[i]]$splitDiff>0.6 &            (lstsplt[[i]]$Char_Name=="Enterococcus"|lstsplt[[i]]$Char_Name=="Escherichia coli"|lstsplt[[i]]$Char_Name=="Fecal Coliform"|lstsplt[[i]]$Char_Name=="Total Coliform")),bold=TRUE)%>%
         column_spec(1,width="10em")%>%
-        column_spec(5:6,width="3em")
+        column_spec(5:6,width="5em")%>%
+          #hide last column, don't want it shown
+        column_spec(11,width="0em",color="white")
         )
 }
 ```
 
-# Data issues
+# Data Qualifications
+
+The following tables outline data qualifications or comments noted by either the DEQ laboratory or `r spltlabnm`
 ```{r echo=FALSE, results='asis'}
 #get a table of all the comments
 issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(lab_Comments.deq)|!is.na(Activity_Comment.split)
-                          |!is.na(Result_Comment.split)|!is.na(lab_Comments.split),
-               select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Activity_Comment.deq,
-                                 Result_Comment.deq,lab_Comments.deq,Activity_Comment.split,Result_Comment.split,lab_Comments.split)) %>%
+                          |!is.na(Result_Comment.split)|!is.na(lab_Comments.split)) %>%
                mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
                select(-Char_Speciation.deq)
+#reformat date
+issues$SampleStartDate<-format(issues$SampleStartDate,format="%m-%d-%Y")
+
 #combine all comments into one row for deq and for split lab
 #need to fix NA issue
-issues$Comment.deq<-paste(issues$Activity_Comment.deq,issues$Result_Comment.deq,issues$lab_Comments.deq)
-issues$Comment.split<-paste(issues$Activity_Comment.split,issues$Result_Comment.split,issues$lab_Comments.split)
+issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
+                          ifelse(!is.na(issues$Result_Comment.deq),issues$Result_Comment.deq,''),
+                          ifelse(!is.na(issues$lab_Comments.deq),issues$lab_Comments.deq,''))
+issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$Activity_Comment.split,''),
+                            ifelse(!is.na(issues$Result_Comment.split),issues$Result_Comment.split,''),
+                            ifelse(!is.na(issues$lab_Comments.split),issues$lab_Comments.split,''))
 
-#select certain columns
-issues<-subset(issues,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.deq,Comment.split))
 
-names(issues)<-c("Station","Date","Time","Analyte","DEQ Lab Comments","Split Lab Comments")
+#table for DEQ issues, select certain columns
+deqissues<-subset(issues,!is.na(Activity_Comment.deq)
+                          |!is.na(Result_Comment.deq)
+                          |!is.na(lab_Comments.deq),
+                  select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.deq))
+#table for split data issues, select certain columns
+spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split)|!is.na(lab_Comments.split),
+                   select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.split))
 
-#big table, still needs work. Maybe split into two (deq vs split lab) or by site?
-kable(issues,format='latex',caption="Data Issues",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_option="HOLD_position")%>%
-        column_spec(1:4,width="6em")%>%
-        column_spec(5:6,width="15em")
+names(deqissues)<-c("Station","Date","Time","Analyte","DEQ Data Lab Comments")
+names(spltissues)<-c("Station","Date","Time","Analyte","Split Data Lab Comments")
+
+#can be big table, still needs work. Maybe split into two (deq vs split lab) or by site?
+kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped"))%>%
+        column_spec(1:3,width="6em")%>%
+        column_spec(4,width="10em")%>%
+        column_spec(5,width="12em")
+        
+
+kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped"))%>%
+        column_spec(1:3,width="6em")%>%
+        column_spec(4,width="10em")%>%
+        column_spec(5,width="12em")
 
 ```
