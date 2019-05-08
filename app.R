@@ -47,6 +47,16 @@ ui<-fluidPage(
   #sidebar with parameter inputs
   sidebarLayout(
     sidebarPanel(
+      #permit #
+      textInput("permittee",
+                label="Permit Number"),
+      #report to
+      textInput("report",
+                label="Report To:"),
+      # Add line
+      tags$hr(),
+      #Add break
+      tags$br(),
       # Start Date (make start date six months ago)
       dateInput("startd",
                 label = "Select Start Date",
@@ -101,7 +111,11 @@ ui<-fluidPage(
         #Comparison
         tabPanel("Split Comparison",dataTableOutput("splitData")),
         #table of non matching analytes
-        tabPanel("Non Matching Data",dataTableOutput("nomatchdeq"))
+        tabPanel("Non Matching Data",dataTableOutput("nomatchdeq")),
+        #Conclusions and Summary
+        tabPanel("Review",
+                 textAreaInput("comp","Comparison",width='1000px',height='400px'),
+                 textAreaInput("conc","Conclusion",width='1000px',height='400px'))
       )
     )
   ),
@@ -223,7 +237,7 @@ ui<-fluidPage(
   
   #R markdown report
   output$report<-downloadHandler(
-    filename = function() {paste(input$org,"_", Sys.Date() ,"_SplitReport.pdf", sep="")},
+    filename = function() {paste(Sys.Date() ,"_SplitReport.pdf", sep="")},
     content=function(file){
       
       #create a file in a temporary directory
@@ -236,7 +250,12 @@ ui<-fluidPage(
       params<-list(data=data(),
                    split=splitData(),
                    org=orgData(),
-                   deq=deqData()
+                   deq=deqData(),
+                   perm=input$permittee,
+                   rep=input$report,
+                   comp=input$comp,
+                   conc=input$conc
+                   
 )
       
       rmarkdown::render(tempReport, output_file=file,
