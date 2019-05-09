@@ -6,7 +6,7 @@ splitcomp<-function(deq,splt)
   #splt is split dataset
   
   require(dplyr)
-  source("E:/Permit Job/R_Scripts/ShinyNPDES_AWQMS/NameandFraction.R")
+  source("W:/R_Scripts/ShinyNPDES_AWQMS/NameandFraction.R")
 
   
 #####UNITS
