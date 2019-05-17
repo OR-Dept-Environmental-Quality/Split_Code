@@ -61,7 +61,7 @@ splt<-namefrac(splt)
                            jn$qctype=="Diff" & jn$Result_Operator.deq!="=" & jn$Result_Operator.split=="=" 
                              ~abs(jn$Result_Numeric.split-jn$MRLValue.deq),
                            jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split!="=" 
-                             ~abs(jn$Result_Numeric.deq-jn$MRLValue.deq), 
+                             ~abs(jn$Result_Numeric.deq-jn$MRLValue.split), 
                            jn$qctype=="Micro" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" 
                              ~abs(log10(jn$Result_Numeric.deq)-log10(jn$Result_Numeric.split)),
                            jn$qctype=="Micro"& jn$Result_Operator.deq=="=" & jn$Result_Operator.split!="=" 
