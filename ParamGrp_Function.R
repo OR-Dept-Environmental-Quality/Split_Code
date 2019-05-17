@@ -7,6 +7,8 @@ param_grp<-function(x){
   require(dplyr)
   
   #groupings
+  
+  #need to add all total and dissolved cases to metals that result from namefrac, or else they won't show up
   metals<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)","Aluminum","Iron","Lead","Mercury","Nickel","Silver","Thallium","Antimony","Arsenic","Arsenic, Inorganic",
             "Beryllium","Cadmium","Chromium","Copper","Zinc","Selenium","Chromium(III)","Chromium(VI)","Arsenic ion (3+)","Calcium","Cobalt",
             "Lithium","Beryllium","Manganese","Magnesium","Molybdenum","Potassium","Sodium","Uranium","Vanadium","Barium","Boron")
@@ -37,7 +39,7 @@ param_grp<-function(x){
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon",
           "Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids","Total hardness",
           "Hardness, Ca, Mg","Sulfate","Chloride","Silica")
-    
+  
   #create group column in dataframe
   x$param_grp<-case_when(x$Char_Name %in% metals ~"Metals",
                          x$Char_Name %in% voc ~ "VOCs",
