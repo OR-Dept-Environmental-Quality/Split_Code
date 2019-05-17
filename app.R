@@ -11,6 +11,7 @@ library(shinybusy)
 library(openxlsx)
 library(dplyr)
 source("Split_Comp_Function.R")
+source("ParamGrp_Function.R")
 
 #attempt to turn off scientific notation
 options(scipen=999)
@@ -138,6 +139,8 @@ ui<-fluidPage(
       #actual query for data
       dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,org=c(input$orgs,"OREGONDEQ"),project=c(input$project),station=c(input$monlocs))
       
+      dat
+      
     })
     
     #show data (for QC purposes for now)
@@ -167,7 +170,7 @@ ui<-fluidPage(
       viewOrg
     })
     
-    #table of Org Data
+    #table of Org Data for shiny app view
     output$orgData<-renderDataTable({
       subset(orgData(),select=c(Org_Name,Project1,MLocID,StationDes,Lat_DD,Long_DD,act_id,SampleStartDate,SampleStartTime,SampleStartTZ,
                         SampleMedia,SampleSubmedia,Char_Name,Char_Speciation,Sample_Fraction,CASNumber,Result_status,Result_Type,
