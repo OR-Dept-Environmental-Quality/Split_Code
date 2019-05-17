@@ -31,6 +31,9 @@ library(tidyverse)
 #included packages in YAML header to fix problem
 library(kableExtra)
 library(tinytex)
+
+source("W:/R_Scripts/Split_Code/ParamGrp_Function.R")
+source("W:/R_Scripts/Split_Code/QC_Issue.R")
 ```
 
 ```{r echo=FALSE}
@@ -121,6 +124,69 @@ calculation of the difference. Microbiology parameters are acceptable when the a
 
 # Summary
 
+The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits.
+
+```{r echo=FALSE, results='asis'}
+#create summary tables of what is out of QC 
+
+#need full split report
+spltcomp<-params$split
+
+#add in parameter groupings
+spltcomp<-param_grp(spltcomp)
+
+#add issue column 
+spltcomp<-qc_issue(spltcomp)
+
+
+#create tables based on groups, only include where QC is violated
+
+#VOC
+voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+  
+
+kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")
+
+#SemiVol
+semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+
+kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")
+
+#Metals  #NOT SHOWING UP-NAMES DON'T MATCH DUE TO namefrac function being used to do split
+metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+
+kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")
+
+#Phys Chem
+phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))%>%
+  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")
+
+
+```
+
 ## *Comparison*
 
 `r params$comp`
@@ -132,12 +198,11 @@ calculation of the difference. Microbiology parameters are acceptable when the a
 # Split Sample Report
 
 ```{r echo=FALSE, results='asis'}
-#need full split report
-spltcomp<-params$split
+
 
 #get subset of columns, combine characteristic name ans speciation
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
-                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff))%>%
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
@@ -165,19 +230,15 @@ for (i in 1:length(lstsplt)){
   #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
   #so we create MRLNum variable to use and then hide the column later
   lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
-  lstsplt[[i]]$MRLNum<-lstsplt[[i]]$MRLValue.deq
   lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
   
-  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Num"),
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
             caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
-        row_spec(which(lstsplt[[i]]$splitRPD>30),bold=TRUE) %>%
-        row_spec(which(lstsplt[[i]]$splitDiff>(2*lstsplt[[i]]$MRLNum) &            (lstsplt[[i]]$Char_Name!="pH"|lstsplt[[i]]$Char_Name!="Enterococcus"|lstsplt[[i]]$Char_Name!="Escherichia coli"|lstsplt[[i]]$Char_Name!="Fecal Coliform"|lstsplt[[i]]$Char_Name!="Total Coliform")),bold=TRUE)%>%
-          row_spec(which(lstsplt[[i]]$splitDiff>0.5 & lstsplt[[i]]$Char_Name=="pH"),bold=TRUE)%>%
-            row_spec(which(lstsplt[[i]]$splitDiff>0.6 &            (lstsplt[[i]]$Char_Name=="Enterococcus"|lstsplt[[i]]$Char_Name=="Escherichia coli"|lstsplt[[i]]$Char_Name=="Fecal Coliform"|lstsplt[[i]]$Char_Name=="Total Coliform")),bold=TRUE)%>%
+        row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE) %>%
         column_spec(1,width="10em")%>%
-        column_spec(5:6,width="5em")%>%
+        column_spec(5:6,width="5em") %>%
           #hide last column, don't want it shown
         column_spec(11,width="0em",color="white")
         )
@@ -210,26 +271,26 @@ issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$
 deqissues<-subset(issues,!is.na(Activity_Comment.deq)
                           |!is.na(Result_Comment.deq)
                           |!is.na(lab_Comments.deq),
-                  select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.deq))
+                  select=c(MLocID,Char_Name,Comment.deq))
 #table for split data issues, select certain columns
 spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split)|!is.na(lab_Comments.split),
-                   select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Comment.split))
+                   select=c(MLocID,Char_Name,Comment.split))
 
-names(deqissues)<-c("Station","Date","Time","Analyte","DEQ Data Lab Comments")
-names(spltissues)<-c("Station","Date","Time","Analyte","Split Data Lab Comments")
+names(deqissues)<-c("Station","Analyte","DEQ Data Lab Comments")
+names(spltissues)<-c("Station","Analyte","Split Data Lab Comments")
 
 #can be big table, still needs work. Maybe split into two (deq vs split lab) or by site?
 kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"))%>%
-        column_spec(1:3,width="6em")%>%
-        column_spec(4,width="10em")%>%
-        column_spec(5,width="12em")
+        column_spec(1,width="8em")%>%
+        column_spec(2,width="12em")%>%
+        column_spec(3,width="26em")
         
 
 kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"))%>%
-        column_spec(1:3,width="6em")%>%
-        column_spec(4,width="10em")%>%
-        column_spec(5,width="12em")
+        column_spec(1,width="8em")%>%
+        column_spec(2,width="12em")%>%
+        column_spec(3,width="26em")
 
 ```
