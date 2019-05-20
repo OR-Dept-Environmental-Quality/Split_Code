@@ -11,7 +11,20 @@ param_grp<-function(x){
   #need to add all total and dissolved cases to metals that result from namefrac, or else they won't show up
   metals<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)","Aluminum","Iron","Lead","Mercury","Nickel","Silver","Thallium","Antimony","Arsenic","Arsenic, Inorganic",
             "Beryllium","Cadmium","Chromium","Copper","Zinc","Selenium","Chromium(III)","Chromium(VI)","Arsenic ion (3+)","Calcium","Cobalt",
-            "Lithium","Beryllium","Manganese","Magnesium","Molybdenum","Potassium","Sodium","Uranium","Vanadium","Barium","Boron")
+            "Lithium","Beryllium","Manganese","Magnesium","Molybdenum","Potassium","Sodium","Uranium","Vanadium","Barium","Boron",
+            "Aluminum, Dissolved","Aluminum, Total Recoverable","Antimony, Dissolved", "Arsenic, Dissolved","Barium, Dissolved",
+            "Beryllium, Dissolved","Boron, Dissolved","Boron, Total Recoverable","Cadmium, Dissolved","Calcium, Total Recoverable",
+            "Chromium, Dissolved","Cobalt, Dissolved","Copper, Dissolved","Iron, Total Recoverable","Lead, Dissolved","Lithium, Dissolved",
+            "Lithium, Total Recoverable","Magnesium, Total Recoverable", "Manganese, Total Recoverable","Molybdenum, Dissolved",
+            "Molybdenum, Total Recoverable","Nickel, Dissolved","Potassium, Total Recoverable", "Selenium, Dissolved",
+            "Silica, Dissolved","Silica, Total Recoverable","Silver, Dissolved","Sodium, Total Recoverable","Thallium, Dissolved",
+            "Uranium, Dissolved", "Uranium, Total Recoverable","Vanadium, Dissolved","Zinc, Dissolved", "Antimony, Total Recoverable",
+            "Arsenic, Total Recoverable","Barium, Total Recoverable","Beryllium, Total Recoverable","Boron, Total Recoverable",
+            "Cadmium, Total Recoverable","Calcium, Dissolved", "Chromium, Total Recoverable","Cobalt, Total Recoverable",
+            "Copper, Total Recoverable","Iron, Dissolved","Lead, Total Recoverable","Magnesium, Dissolved","Manganese, Dissolved",
+            "Molybdenum, Dissolved","Nickel, Total Recoverable","Potassium, Dissolved", "Selenium, Total Recoverable",
+            "Silver, Total Recoverable","Sodium, Dissolved","Thallium, Total Recoverable", "Vanadium, Total Recoverable",
+            "Zinc, Total Recoverable" )
   
   voc<-c("1,1,1,2-Tetrachloroethane", "1,1,1-Trichloroethane", "1,1,2,2-Tetrachloroethane", "1,1,2-Trichloroethane", "1,1-Dichloroethane", 
          "1,1-Dichloroethylene", "1,1-Dichloropropene", "1,2,3-Trichlorobenzene","1,2,3-Trichloropropane", "1,2,4-Trimethylbenzene", 
@@ -36,9 +49,9 @@ param_grp<-function(x){
            "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", "Naphthalene")
   
   phys<-c("Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
-          "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon",
-          "Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids","Total hardness",
-          "Hardness, Ca, Mg","Sulfate","Chloride","Silica")
+          "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
+          "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
+          "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable")
   
   #create group column in dataframe
   x$param_grp<-case_when(x$Char_Name %in% metals ~"Metals",
