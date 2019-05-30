@@ -51,7 +51,8 @@ param_grp<-function(x){
   phys<-c("Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
           "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
-          "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable")
+          "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
+          "Biochemical oxygen demand, standard conditions","Tannin and Lignin")
   
   #create group column in dataframe
   x$param_grp<-case_when(x$Char_Name %in% metals ~"Metals",
