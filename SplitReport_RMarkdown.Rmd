@@ -131,21 +131,46 @@ calculation of the difference. Microbiology parameters are acceptable when the a
 ## *Comparison Limit Tables* 
 The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits.
 
+
 ```{r echo=FALSE, results='asis'}
 #create summary tables of what is out of QC 
 
 #need full split report
 spltcomp<-params$split
 
-#add in parameter groupings
-spltcomp<-param_grp(spltcomp)
-
 #add issue column 
 spltcomp<-qc_issue(spltcomp)
 
 
+#make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
+
+if(unique(spltorg$Project1)=="Effluent Monitoring") {
+  iss<-subset(spltcomp,issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+  
+ if(nrow(iss)>0)
+   {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")} else {cat("**No analytes outside of acceptable criteria limits**")}
+}
+
+#if landfill project, split out tables (need to do separate if statements for each table so that they show up properly)
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+  #add in parameter groupings
+
+  spltcomp<-param_grp(spltcomp)
+  
+  #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" (need to do after param_grp function for names' sake)
+spltcomp<-spltcomp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))}
+
 #create tables based on groups, only include where QC is violated
 
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #VOC
 #take rows where we have QC violations, only return columns we need (station, analyte, results, unit, and RPD/diff)
 voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
@@ -154,36 +179,45 @@ voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,
 #order by analyte
 voc<-voc[order(voc$Char_Name),]
   
+if(nrow(voc)>0){
 kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
-  column_spec(3:7,width="5em")
+  column_spec(3:7,width="5em")}
+}
 
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #SemiVol
 semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
 semivol<-semivol[order(semivol$Char_Name),]
 
+if(nrow(semivol)>0){
 kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
-  column_spec(3:7,width="5em")
+  column_spec(3:7,width="5em")}
+}
 
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #Metals  #NOT SHOWING UP-NAMES DON'T MATCH DUE TO namefrac function being used to do split
 metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
 metals<-metals[order(metals$Char_Name),]
 
+if(nrow(metals)>0){
 kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
-  column_spec(3:7,width="5em")
+  column_spec(3:7,width="5em")}
+}
 
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #Phys Chem
 phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))%>%
@@ -192,12 +226,16 @@ phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,
 
 phys<-phys[order(phys$Char_Name),]
 
+if(nrow(phys)>0){
 kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
-  column_spec(3:7,width="5em")
+  column_spec(3:7,width="5em")}
+}
 
+if(unique(spltorg$Project1)=="Landfill Monitoring" & nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0) 
+{cat("**No analytes outside of acceptable criteria limits**")}
 
 ```
 
@@ -214,6 +252,8 @@ kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Un
 ```{r echo=FALSE, results='asis'}
 
 
+if(unique(spltorg$Project1)=="Landfill Monitoring")
+{
 #get subset of columns, combine characteristic name ans speciation
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,param_grp,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
@@ -225,7 +265,9 @@ spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
 
 #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
 spltrp<-spltrp%>%
-  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
 
 #this table is huge and unwieldy, try splitting it down by station/date/time/parameter group
 #need to concatenate a column with MLocID and param_grp together so that it splits down accordingly
@@ -262,11 +304,67 @@ for (i in 1:length(lstsplt)){
         row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
         )
 }
+
+}
+
+if(unique(spltorg$Project1)=="Effluent Monitoring")
+{
+#get subset of columns, combine characteristic name ans speciation
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
+  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+#reformat date
+spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
+spltrp<-spltrp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
+
+#this table is huge and unwieldy, try splitting it down by station/date/time/parameter group
+
+lstsplt<-split(spltrp,spltrp$MLocID)
+
+for (i in 1:length(lstsplt)){
+  #get station, date, and time as variables so we can put them in the table name
+  station<-unique(lstsplt[[i]]$MLocID)
+  date<-unique(lstsplt[[i]]$SampleStartDate)
+  time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+  
+  #remove station, date, and time columns
+  lstsplt[[i]]$MLocID<-NULL
+  lstsplt[[i]]$SampleStartDate<-NULL
+  lstsplt[[i]]$SampleStartTime.deq<-NULL
+  
+  #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
+  #so we create MRLNum variable to use and then hide the column later
+  lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
+  lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
+  
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+            caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
+        column_spec(1,width="7em") %>%
+        column_spec(2:3,width="3em")%>%
+        column_spec(5:6,width="7em") %>%
+        column_spec(7:8,width="3em")%>%
+            #hide last column, don't want it shown
+        column_spec(11,width="0em",color="white") %>%
+        row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
+        )
+}
+
+}
 ```
 
 # Data Qualifications
 
 The following tables outline data qualifications or comments noted by either the DEQ laboratory or `r spltlabnm`
+
 ```{r echo=FALSE, results='asis'}
 #get a table of all the comments
 issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(lab_Comments.deq)|!is.na(Activity_Comment.split)
@@ -299,17 +397,20 @@ names(deqissues)<-c("Station","Analyte","DEQ Data Lab Comments")
 names(spltissues)<-c("Station","Analyte","Split Data Lab Comments")
 
 #can be big table, still needs work. Maybe split into two (deq vs split lab) or by site?
+if(nrow(deqissues)>0){
 kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
         column_spec(1,width="8em")%>%
         column_spec(2,width="12em")%>%
         column_spec(3,width="30em")
-        
+   } else cat("**No DEQ data quality issues**")     
 
+if(nrow(spltissues)>0){
 kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
         column_spec(1,width="8em")%>%
         column_spec(2,width="12em")%>%
         column_spec(3,width="30em")
+} else cat("**No split data quality issues**")  
 
 ```
