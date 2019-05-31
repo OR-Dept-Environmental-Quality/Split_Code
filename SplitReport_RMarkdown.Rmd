@@ -148,8 +148,14 @@ if(unique(spltorg$Project1)=="Effluent Monitoring") {
   iss<-subset(spltcomp,issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
   
+   #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" (need to do after param_grp function for names' sake)
+iss<-iss%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
+
  if(nrow(iss)>0)
-   {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+   {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Analytes outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
@@ -234,8 +240,10 @@ kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Un
   column_spec(3:7,width="5em")}
 }
 
-if(unique(spltorg$Project1)=="Landfill Monitoring" & nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0) 
+if(unique(spltorg$Project1=="Landfill Monitoring")){
+if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0) 
 {cat("**No analytes outside of acceptable criteria limits**")}
+}
 
 ```
 
@@ -324,20 +332,22 @@ spltrp<-spltrp%>%
   mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
   mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
 
-#this table is huge and unwieldy, try splitting it down by station/date/time/parameter group
-
-lstsplt<-split(spltrp,spltrp$MLocID)
+#this table is huge and unwieldy, try splitting it down by station/date/time
+spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate,spltrp$SampleStartTime)
+lstsplt<-split(spltrp,spltrp$stdttm)
 
 for (i in 1:length(lstsplt)){
   #get station, date, and time as variables so we can put them in the table name
   station<-unique(lstsplt[[i]]$MLocID)
   date<-unique(lstsplt[[i]]$SampleStartDate)
   time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+  stdttm<-unique(lstsplt[[i]]$stdttm)
   
   #remove station, date, and time columns
   lstsplt[[i]]$MLocID<-NULL
   lstsplt[[i]]$SampleStartDate<-NULL
   lstsplt[[i]]$SampleStartTime.deq<-NULL
+  lstsplt[[i]]$stdttm<-NULL
   
   #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
   #so we create MRLNum variable to use and then hide the column later
@@ -367,8 +377,8 @@ The following tables outline data qualifications or comments noted by either the
 
 ```{r echo=FALSE, results='asis'}
 #get a table of all the comments
-issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(lab_Comments.deq)|!is.na(Activity_Comment.split)
-                          |!is.na(Result_Comment.split)|!is.na(lab_Comments.split)) %>%
+issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(Activity_Comment.split)
+                          |!is.na(Result_Comment.split)) %>%
                mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
                select(-Char_Speciation.deq)
 #reformat date
@@ -377,20 +387,17 @@ issues$SampleStartDate<-format(issues$SampleStartDate,format="%m-%d-%Y")
 #combine all comments into one row for deq and for split lab
 #need to fix NA issue
 issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
-                          ifelse(!is.na(issues$Result_Comment.deq),issues$Result_Comment.deq,''),
-                          ifelse(!is.na(issues$lab_Comments.deq),issues$lab_Comments.deq,''))
+                          ifelse(!is.na(issues$Result_Comment.deq),issues$Result_Comment.deq,''))
 issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$Activity_Comment.split,''),
-                            ifelse(!is.na(issues$Result_Comment.split),issues$Result_Comment.split,''),
-                            ifelse(!is.na(issues$lab_Comments.split),issues$lab_Comments.split,''))
+                            ifelse(!is.na(issues$Result_Comment.split),issues$Result_Comment.split,''))
 
 
 #table for DEQ issues, select certain columns
 deqissues<-subset(issues,!is.na(Activity_Comment.deq)
-                          |!is.na(Result_Comment.deq)
-                          |!is.na(lab_Comments.deq),
+                          |!is.na(Result_Comment.deq),
                   select=c(MLocID,Char_Name,Comment.deq))
 #table for split data issues, select certain columns
-spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split)|!is.na(lab_Comments.split),
+spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split),
                    select=c(MLocID,Char_Name,Comment.split))
 
 names(deqissues)<-c("Station","Analyte","DEQ Data Lab Comments")
