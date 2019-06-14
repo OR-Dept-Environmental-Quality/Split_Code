@@ -141,7 +141,6 @@ spltcomp<-params$split
 #add issue column 
 spltcomp<-qc_issue(spltcomp)
 
-
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
 if(unique(spltorg$Project1)=="Effluent Monitoring") {
@@ -323,6 +322,9 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
+#make split lab LOQ 'NR' if not reported
+spltrp$MRLValue.split<-ifelse(is.na(spltrp$MRLValue.split),"NR",spltrp$MRLValue.split)
+
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
 
@@ -412,6 +414,10 @@ kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,r
         column_spec(3,width="30em")
    } else cat("**No DEQ data quality issues**")     
 
+#create new code chunk for the split data table, otherwise if there are no issues with both DEQ or split data the two returned lines end up being smashed into one line of text without spaces-doesn't look pretty
+```
+
+```{r echo=FALSE, results='asis'}
 if(nrow(spltissues)>0){
 kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
@@ -419,5 +425,4 @@ kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRU
         column_spec(2,width="12em")%>%
         column_spec(3,width="30em")
 } else cat("**No split data quality issues**")  
-
 ```
