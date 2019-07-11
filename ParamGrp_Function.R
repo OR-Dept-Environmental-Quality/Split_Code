@@ -36,7 +36,8 @@ param_grp<-function(x){
          "Ethylene dibromide","Fluorotrichloromethane", "Halon 1011", "Hexachlorobutadiene", "m-Dichlorobenzene", "Methyl bromide", "Methyl ethyl ketone", 
          "Methyl isobutyl ketone", "Methyl tert-butyl ether", "Methylene chloride", "m-Xylene", "Naphthalene", "n-Butylbenzene","trans-1,3-Dichloropropene",
          "n-Propylbenzene", "o-Chlorotoluene", "o-Dichlorobenzene", "o-Xylene", "p-Chlorotoluene", "p-Dichlorobenzene", "p-Xylene", 
-         "sec-Butylbenzene","Styrene","Toluene","Trichloroethene (TCE)", "o-Xylene, mixt. with m-xylene and p-xylene","Xylene","m,p-Xylene")
+         "sec-Butylbenzene","Styrene","Toluene","Trichloroethene (TCE)", "o-Xylene, mixt. with m-xylene and p-xylene","Xylene","m,p-Xylene",
+         "Tetrachloroethylene","Trichloroethylene")
   
   semiv<-c("1,2,4,5-Tetrachlorobenzene", "1,2,4-Trichlorobenzene", "1-Methylphenanthrene", "1-Methylpyrene", "2,3,4,6-Tetrachlorophenol", 
            "2,3,5,6-Tetrachlorophenol", "2,4,5-Trichlorophenol", "2,4,6-Trichlorophenol", "2,4-Dichlorophenol", "2,4-Dimethylphenol", 
@@ -52,7 +53,7 @@ param_grp<-function(x){
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
           "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
           "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
-          "Biochemical oxygen demand, standard conditions","Tannin and Lignin")
+          "Biochemical oxygen demand, standard conditions","Tannin and Lignin", "Hardness, Ca, Mg, Total Recoverable")
   
   #create group column in dataframe
   x$param_grp<-case_when(x$Char_Name %in% metals ~"Metals",
