@@ -37,6 +37,12 @@ if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
 #where sample fraction doesn't matter (e.g. Dichlorodifluoromethane has been uploaded in AWQMS under Volatile and Extractable sample fractions))
 deq<-namefrac(deq)
 splt<-namefrac(splt)
+
+#If split org did nitrate analysis instead of nitrate-nitrite, and DEQ did nitrate-nitrate, convert split char name to nitrate-nitrite
+#so the two can be compared. Often the results are so similar due to nitrite easily converting to nitrate that the two are comparable. 
+
+if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=str_replace(Char_Name,"Nitrate","Nitrate + Nitrite"))}
+
   #need to join datasets on an inner join
   jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
   
