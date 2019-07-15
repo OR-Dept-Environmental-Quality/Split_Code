@@ -30,15 +30,11 @@ if(!file.exists("query_cache.RData") |
   organization <- organization$OrganizationID
   organization <- sort(organization)
   
-  station <- AWQMS_Stations()
-  station <- station$MLocID
-  station <- sort(station)
-  
   project<-AWQMS_Projects()
   project<-sort(project$Project)
   
   
-  save(project, station, organization, file = 'query_cache.RData')
+  save(project, organization, file = 'query_cache.RData')
 } else {
   load("query_cache.RData")
 }
@@ -79,12 +75,6 @@ ui<-fluidPage(
                      "Select Project",
                      choices=project,
                      multiple=TRUE),
-      
-      # Monitoring locations 
-      selectizeInput("monlocs",
-                     "Select Monitoring Locations",
-                     choices = station,
-                     multiple = TRUE), 
       
       #add action button, idea is to not run query until the button is clicked, otherwise it tries to query all AWQMS data at once and crashes
       actionButton("goButton","Run Query"),
@@ -137,7 +127,7 @@ ui<-fluidPage(
       rendd<-toString(sprintf("%s",input$endd))
       
       #actual query for data
-      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,org=c(input$orgs,"OREGONDEQ"),project=c(input$project),station=c(input$monlocs))
+      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,org=c(input$orgs,"OREGONDEQ"),project=c(input$project))
       
       dat
       
