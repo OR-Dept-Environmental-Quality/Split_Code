@@ -378,25 +378,26 @@ for (i in 1:length(lstsplt)){
 The following tables outline data qualifications or comments noted by either the DEQ laboratory or `r spltlabnm`
 
 ```{r echo=FALSE, results='asis'}
-#get a table of all the comments
+#get a table of all the comments (don't use lab comment, is very generic and not helpful- just have activity comment and result comment)
 issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(Activity_Comment.split)
                           |!is.na(Result_Comment.split)) %>%
                mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
                select(-Char_Speciation.deq)
+
 #reformat date
 issues$SampleStartDate<-format(issues$SampleStartDate,format="%m-%d-%Y")
 
 #combine all comments into one row for deq and for split lab
-#need to fix NA issue
 issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
                           ifelse(!is.na(issues$Result_Comment.deq),issues$Result_Comment.deq,''))
 issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$Activity_Comment.split,''),
                             ifelse(!is.na(issues$Result_Comment.split),issues$Result_Comment.split,''))
 
 
-#table for DEQ issues, select certain columns
-deqissues<-subset(issues,!is.na(Activity_Comment.deq)
-                          |!is.na(Result_Comment.deq),
+#table for DEQ issues, select certain columns (just want station, characteristic, and comment column)
+#remove comment ">::B >2419;"- this occurs when the microbial test has maxed out its count, as is confusing to non-DEQ folks
+deqissues<-subset(issues,(!is.na(Activity_Comment.deq)
+                          |!is.na(Result_Comment.deq))& !(Result_Comment.deq %in% ">::B >2419;"),
                   select=c(MLocID,Char_Name,Comment.deq))
 #table for split data issues, select certain columns
 spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split),
