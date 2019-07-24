@@ -12,6 +12,7 @@ library(openxlsx)
 library(dplyr)
 source("Split_Comp_Function.R")
 source("ParamGrp_Function.R")
+source("W:/R_Scripts/ShinyNPDES_AWQMS/NPDES_AWQMSQuery.R")
 
 #attempt to turn off scientific notation
 options(scipen=999)
