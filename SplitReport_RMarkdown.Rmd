@@ -155,7 +155,7 @@ iss<-iss%>%
 
  if(nrow(iss)>0)
    {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Analytes outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")} else {cat("**No analytes outside of acceptable criteria limits**")}
@@ -186,7 +186,7 @@ voc<-voc[order(voc$Char_Name),]
   
 if(nrow(voc)>0){
 kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -201,7 +201,7 @@ semivol<-semivol[order(semivol$Char_Name),]
 
 if(nrow(semivol)>0){
 kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -216,7 +216,7 @@ metals<-metals[order(metals$Char_Name),]
 
 if(nrow(metals)>0){
 kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -233,7 +233,7 @@ phys<-phys[order(phys$Char_Name),]
 
 if(nrow(phys)>0){
 kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -302,7 +302,7 @@ for (i in 1:length(lstsplt)){
   
   print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
             caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
         column_spec(1,width="10em") %>%
         column_spec(5:6,width="5em") %>%
@@ -358,7 +358,7 @@ for (i in 1:length(lstsplt)){
   
   print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
             caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
         column_spec(1,width="7em") %>%
         column_spec(2:3,width="3em")%>%
@@ -409,7 +409,7 @@ names(spltissues)<-c("Station","Analyte","Split Data Lab Comments")
 #can be big table, still needs work. Maybe split into two (deq vs split lab) or by site?
 if(nrow(deqissues)>0){
 kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         column_spec(1,width="8em")%>%
         column_spec(2,width="12em")%>%
         column_spec(3,width="30em")
@@ -421,7 +421,7 @@ kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,r
 ```{r echo=FALSE, results='asis'}
 if(nrow(spltissues)>0){
 kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-        kable_styling(latex_options=c("HOLD_position","striped"),font_size=9)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         column_spec(1,width="8em")%>%
         column_spec(2,width="12em")%>%
         column_spec(3,width="30em")
