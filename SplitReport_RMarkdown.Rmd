@@ -117,7 +117,7 @@ The laboratory measurements are compared by one of two methods based on the samp
 Method Reporting Limit (MRL) for that analyte.
 
 Difference: When one or both of the duplicates are less than five times the MRL, the values are compared by difference. The results are
-acceptable when the difference between the samples is less than twice the MRL.
+acceptable when the difference between the samples is less than twice the MRL. In the event that the split lab reports to the MDL, differences for reported values that fall between the MDL and the MRL (aka 'J flag' results) will be shown for informational purposes only.
 
 RPD: When both of the duplicate samples are greater than or equal to five times the MRL, the values are compared using the relative
 percent difference between the samples. The RPD is determined as the difference between the samples divided by the average of the
