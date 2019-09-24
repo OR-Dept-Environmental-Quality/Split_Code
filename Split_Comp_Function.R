@@ -64,19 +64,10 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
     
   #Calculate difference for Diff and Micro don't always get MRL from split lab, use ours to be safe 
   #if micro result is 0, use DEQ MRL since log of 0 is infinity. 
-  jn$splitDiff<- case_when(#if split lab reports to DL and has J flag result, then use split MRL to calculate difference 
-                           #(since we only report to MRL, this is more fair)
-                           jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" & jn$Result_Numeric.split<jn$MRLValue.split
-                           ~abs(jn$Result_Numeric.deq-jn$MRLValue.split),
-                           jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" 
+  jn$splitDiff<- case_when(jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" 
                            ~abs(jn$Result_Numeric.deq-jn$Result_Numeric.split),
-                           
-                           #had some cases where split lab reported to DL- but it isn't really a good idea to compare an estimated J flag 
-                           #value reported to the DL with the MRL, so we'll only calculate the difference if the split value is above the MRL
-                           
-                           jn$qctype=="Diff" & jn$Result_Operator.deq!="=" & jn$Result_Operator.split=="=" & jn$Result_Numeric.split>jn$MRLValue.split
+                           jn$qctype=="Diff" & jn$Result_Operator.deq!="=" & jn$Result_Operator.split=="=" 
                              ~abs(jn$Result_Numeric.split-jn$MRLValue.deq),
-                           
                            jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split!="=" 
                              ~abs(jn$Result_Numeric.deq-jn$MRLValue.split), 
                            jn$qctype=="Micro" & (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & 
@@ -126,9 +117,9 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
 
 #test dataset
 #library(AWQMSdata)
-#dat<-AWQMS_Data(startdate='2019-04-01',enddate='2019-05-03',project='Landfill Monitoring',org=c('OREGONDEQ','COFFINBUTTE_LF(NOSTORETID)'))
+#dat<-AWQMS_Data(startdate='2018-05-01',enddate='2018-05-03',project='Landfill Monitoring',org=c('OREGONDEQ','RVBND_LF(NOSTORETID)'))
 #deq<-subset(dat,OrganizationID=='OREGONDEQ')
-#rvb<-subset(dat,OrganizationID=='COFFINBUTTE_LF(NOSTORETID)')
+#rvb<-subset(dat,OrganizationID=='RVBND_LF(NOSTORETID)')
 
 #test<-splitcomp(deq,rvb)
 
