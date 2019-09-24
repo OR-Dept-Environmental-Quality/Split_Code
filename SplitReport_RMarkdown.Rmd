@@ -62,7 +62,8 @@ knitr::include_graphics("W:/R_Scripts/Split_Code/DEQ-logo-color-notransp-horiz75
 ## `r paste("To: ",params$rep)`
 ## From: Aliana Britson 
 
-# `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)` 
+# `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)`
+# `r paste("Report Date:", Sys.Date())`
 # `r paste("DEQ Sampling Event: ", wrkrdr)`
 ## Date(s): `r paste(dates)`
 ***
@@ -209,7 +210,7 @@ kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab",
 }
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
-#Metals  #NOT SHOWING UP-NAMES DON'T MATCH DUE TO namefrac function being used to do split
+#Metals 
 metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
@@ -268,6 +269,9 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,para
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
+#add j flag to data below MRL for split data reported to MDL
+spltrp$Result.split<-ifelse(spltrp$Result.split<spltrp$MRLValue.split & substr(spltrp$Result.split,start=1,stop=1)!="<",paste0(spltrp$Result.split," J"),spltrp$Result.split)
+
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
 
@@ -317,7 +321,7 @@ for (i in 1:length(lstsplt)){
 
 if(unique(spltorg$Project1)=="Effluent Monitoring")
 {
-#get subset of columns, combine characteristic name ans speciation
+#get subset of columns, combine characteristic name and speciation
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
