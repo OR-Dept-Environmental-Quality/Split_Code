@@ -134,7 +134,7 @@ calculation of the difference. Microbiology parameters are acceptable when the a
 The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits.
 
 
-```{r echo=FALSE, results='asis'}
+```{r echo=FALSE, results='asis', warning=FALSE}
 #create summary tables of what is out of QC 
 
 #need full split report
@@ -142,6 +142,9 @@ spltcomp<-params$split
 
 #add issue column 
 spltcomp<-qc_issue(spltcomp)
+
+#add j flag to data below MRL for split data reported to MDL
+spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
@@ -268,9 +271,6 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,para
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
-
-#add j flag to data below MRL for split data reported to MDL
-spltrp$Result.split<-ifelse(spltrp$Result.split<spltrp$MRLValue.split & substr(spltrp$Result.split,start=1,stop=1)=="<",paste0(spltrp$Result.split," J"),spltrp$Result.split)
 
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
