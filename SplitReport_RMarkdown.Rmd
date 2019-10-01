@@ -270,7 +270,7 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,para
   select(-Char_Speciation.deq)
 
 #add j flag to data below MRL for split data reported to MDL
-spltrp$Result.split<-ifelse(spltrp$Result.split<spltrp$MRLValue.split & substr(spltrp$Result.split,start=1,stop=1)!="<",paste0(spltrp$Result.split," J"),spltrp$Result.split)
+spltrp$Result.split<-ifelse(spltrp$Result.split<spltrp$MRLValue.split & substr(spltrp$Result.split,start=1,stop=1)=="<",paste0(spltrp$Result.split," J"),spltrp$Result.split)
 
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
