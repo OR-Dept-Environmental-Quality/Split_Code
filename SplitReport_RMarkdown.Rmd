@@ -42,6 +42,7 @@ source("W:/R_Scripts/Split_Code/QC_Issue.R")
 spltorg<-params$org
 spltorgnm<-unique(spltorg$Org_Name)
 spltlabnm<-unique(spltorg$Analytical_Lab)
+  
 dates<-sort(unique(spltorg$SampleStartDate))
 #reformat date
 dates<-format(dates,format="%m-%d-%Y")
@@ -88,7 +89,7 @@ kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.n
 
 ``` {r echo=FALSE, results='asis'}
 
-if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",spltlabnm,
+if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",paste(as.character(spltlabnm),collapse="/"),
 " laboratory which have been reviewed carefully for completeness, precision and accuracy. The quality control
 elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
 Control Sample for most analysis.
