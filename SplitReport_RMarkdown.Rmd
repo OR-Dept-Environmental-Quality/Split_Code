@@ -26,6 +26,7 @@ header-includes:
 ```{r setup-packages-functions, include=FALSE}
 library(knitr)
 library(tidyverse)
+library(ragtop) #for is,blank function
 
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
@@ -90,7 +91,7 @@ kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.n
 ``` {r echo=FALSE, results='asis'}
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",paste(as.character(spltlabnm),collapse="/"),
-" laboratory which have been reviewed carefully for completeness, precision and accuracy. The quality control
+" which have been reviewed carefully for completeness, precision and accuracy. The quality control
 elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
 Control Sample for most analysis.
 
@@ -145,7 +146,7 @@ spltcomp<-params$split
 spltcomp<-qc_issue(spltcomp)
 
 #add j flag to data below MRL for split data reported to MDL
-spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)
+if (is.numeric(spltcomp$MDLValue)) {spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)}
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
@@ -157,7 +158,8 @@ if(unique(spltorg$Project1)=="Effluent Monitoring") {
 iss<-iss%>%
   mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
   mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
-  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
 
  if(nrow(iss)>0)
    {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Analytes outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
@@ -177,7 +179,8 @@ if(unique(spltorg$Project1)=="Landfill Monitoring") {
 spltcomp<-spltcomp%>%
   mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
   mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
-  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))}
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))}
 
 #create tables based on groups, only include where QC is violated
 
@@ -276,11 +279,12 @@ spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,para
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
 
-#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
+#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" and shorten various other names
 spltrp<-spltrp%>%
   mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
   mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
-  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
 
 #this table is huge and unwieldy, try splitting it down by station/date/time/parameter group
 #need to concatenate a column with MLocID and param_grp together so that it splits down accordingly
@@ -322,7 +326,7 @@ for (i in 1:length(lstsplt)){
 
 if(unique(spltorg$Project1)=="Effluent Monitoring")
 {
-#get subset of columns, combine characteristic name and speciation
+#get subset of columns, combine characteristic name and speciation, and remove the speciation column
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
@@ -338,7 +342,8 @@ spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
 spltrp<-spltrp%>%
   mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
   mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
-  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
 
 #this table is huge and unwieldy, try splitting it down by station/date/time
 spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate,spltrp$SampleStartTime)
