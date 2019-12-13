@@ -24,7 +24,7 @@ param_grp<-function(x){
             "Copper, Total Recoverable","Iron, Dissolved","Lead, Total Recoverable","Magnesium, Dissolved","Manganese, Dissolved",
             "Molybdenum, Dissolved","Nickel, Total Recoverable","Potassium, Dissolved", "Selenium, Total Recoverable",
             "Silver, Total Recoverable","Sodium, Dissolved","Thallium, Total Recoverable", "Vanadium, Total Recoverable",
-            "Zinc, Total Recoverable" )
+            "Zinc, Total Recoverable", "Mercury, Total Recoverable")
   
   voc<-c("1,1,1,2-Tetrachloroethane", "1,1,1-Trichloroethane", "1,1,2,2-Tetrachloroethane", "1,1,2-Trichloroethane", "1,1-Dichloroethane", 
          "1,1-Dichloroethylene", "1,1-Dichloropropene", "1,2,3-Trichlorobenzene","1,2,3-Trichloropropane", "1,2,4-Trimethylbenzene", 
