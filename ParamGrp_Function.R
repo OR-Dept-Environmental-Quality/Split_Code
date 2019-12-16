@@ -55,11 +55,14 @@ param_grp<-function(x){
           "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
           "Biochemical oxygen demand, standard conditions","Tannin and Lignin", "Hardness, Ca, Mg, Total Recoverable", "Ammonia, Total")
   
+  pest<-c("N,N-Diethyl-m-toluamide")
+  
   #create group column in dataframe
   x$param_grp<-case_when(x$Char_Name %in% metals ~"Metals",
                          x$Char_Name %in% voc ~ "VOCs",
                          x$Char_Name %in% phys ~ "Physical Chem",
-                         x$Char_Name %in% semiv ~ "Semivolatiles")
+                         x$Char_Name %in% semiv ~ "Semivolatiles",
+                         x$Char_Name %in% pest ~ "Pesticides")
   
   return(x)
 }
