@@ -93,10 +93,16 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
   jn$splitRPD<-round(jn$splitRPD,digits=2)
   
   
+  #need to remove samples from join where the split was taken too far apart in time 
+  #(30 min for now- ask, may need to be taken down to 15-20)
+  jn$timediff.deq<-as.difftime(jn$SampleStartTime.deq,units="mins")
+  jn$timediff.split<-as.difftime(jn$SampleStartTime.split,units="mins")
+  jn$timediff<-abs(jn$timediff.deq-jn$timediff.split)
+  jn<-subset(jn, jn$timediff<=30)
   
   #need to return table of important columns
   #won't include lab comments- they are generic language set by AWQMS and not very helpful
-  jn<-subset(jn,select=c("MLocID","Activity_Type","SampleStartDate","SampleStartTime.deq","Char_Name",
+  jn<-subset(jn,select=c("MLocID","Activity_Type","SampleStartDate","SampleStartTime.deq","Char_Name","StationDes.deq",
                          "Char_Speciation.deq","Result_status.deq","Result_status.split",
                          "Result_Type.deq","Result_Type.split","Result.deq","Result.split",
                          "Result_Unit.deq","Result_Unit.split","Method_Code.deq","Method_Code.split",
@@ -104,6 +110,9 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
                          "MRLType.deq","MRLValue.deq","MRLUnit.deq","MRLType.split","MRLValue.split","MRLUnit.split",
                          "qctype","splitRPD","splitDiff"
                          ))
+  
+  
+  
     
   return(jn)
 }
@@ -117,9 +126,9 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
 
 #test dataset
 #library(AWQMSdata)
-#dat<-AWQMS_Data(startdate='2018-05-01',enddate='2018-05-03',project='Landfill Monitoring',org=c('OREGONDEQ','RVBND_LF(NOSTORETID)'))
+#dat<-AWQMS_Data(startdate='2019-07-23',enddate='2019-07-23',project='Landfill Monitoring',org=c('OREGONDEQ','NEWBERG_LF(NOSTORETID)'))
 #deq<-subset(dat,OrganizationID=='OREGONDEQ')
-#rvb<-subset(dat,OrganizationID=='RVBND_LF(NOSTORETID)')
+#splt<-subset(dat,OrganizationID=='NEWBERG_LF(NOSTORETID)')
 
 #test<-splitcomp(deq,rvb)
 
