@@ -77,9 +77,9 @@ This report compares the analytical results between Oregon DEQ and `r spltlabnm`
 
 options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
-deqdat<-params$deq
+deqdat<-params$split
 
-meta<-unique(subset(deqdat,select=c(MLocID,StationDes,SampleStartDate,SampleStartTime)))
+meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq)))
 #reformat date
 meta$SampleStartDate<-format(meta$SampleStartDate,format="%m-%d-%Y")
 
