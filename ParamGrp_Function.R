@@ -26,6 +26,7 @@ param_grp<-function(x){
             "Silver, Total Recoverable","Sodium, Dissolved","Thallium, Total Recoverable", "Vanadium, Total Recoverable",
             "Zinc, Total Recoverable", "Mercury, Total Recoverable")
   
+  #volatile organic carbons
   voc<-c("1,1,1,2-Tetrachloroethane", "1,1,1-Trichloroethane", "1,1,2,2-Tetrachloroethane", "1,1,2-Trichloroethane", "1,1-Dichloroethane", 
          "1,1-Dichloroethylene", "1,1-Dichloropropene", "1,2,3-Trichlorobenzene","1,2,3-Trichloropropane", "1,2,4-Trimethylbenzene", 
          "1,2-Dibromo-3-chloropropane", "1,2-Dichloroethane", "1,2-Dichloropropane","1,3-Dichlorobenzene", "1,3-Dichloropropane",
@@ -39,6 +40,7 @@ param_grp<-function(x){
          "sec-Butylbenzene","Styrene","Toluene","Trichloroethene (TCE)", "o-Xylene, mixt. with m-xylene and p-xylene","Xylene","m,p-Xylene",
          "Tetrachloroethylene","Trichloroethylene")
   
+  #semivolatiles
   semiv<-c("1,2,4,5-Tetrachlorobenzene", "1,2,4-Trichlorobenzene", "1-Methylphenanthrene", "1-Methylpyrene", "2,3,4,6-Tetrachlorophenol", 
            "2,3,5,6-Tetrachlorophenol", "2,4,5-Trichlorophenol", "2,4,6-Trichlorophenol", "2,4-Dichlorophenol", "2,4-Dimethylphenol", 
            "2,4-Dinitrophenol", "2,4-Dinitrotoluene", "2,6-Dichlorophenol", "2,6-Dinitrotoluene", "2-Chloronaphthalene", 
@@ -49,12 +51,14 @@ param_grp<-function(x){
            "Di-n-octyl phthalate", "Fluoranthene", "Fluorene", "Hexachlorobenzene",  "Hexachlorobutadiene", "Hexachlorocyclopentadiene", 
            "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", "Naphthalene")
   
+  #physical chemistry parameters (a little bit of a grab bag)
   phys<-c("Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
           "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
           "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
           "Biochemical oxygen demand, standard conditions","Tannin and Lignin", "Hardness, Ca, Mg, Total Recoverable", "Ammonia, Total")
   
+  #pesticides
   pest<-c("N,N-Diethyl-m-toluamide")
   
   #create group column in dataframe

@@ -26,7 +26,7 @@ header-includes:
 ```{r setup-packages-functions, include=FALSE}
 library(knitr)
 library(tidyverse)
-library(ragtop) #for is,blank function
+library(ragtop) #for is.blank function
 
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
@@ -185,7 +185,7 @@ spltcomp<-spltcomp%>%
 #create tables based on groups, only include where QC is violated
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
-#VOC
+#VOCs
 #take rows where we have QC violations, only return columns we need (station, analyte, results, unit, and RPD/diff)
 voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
@@ -202,7 +202,7 @@ kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Uni
 }
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
-#SemiVol
+#Semivolatiles
 semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
@@ -232,7 +232,7 @@ kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","
 }
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
-#Phys Chem
+#Physical Chemistry
 phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
                                  Result_Unit.deq,splitRPD,splitDiff))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
@@ -406,7 +406,7 @@ issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$
 
 
 #table for DEQ issues, select certain columns (just want station, characteristic, and comment column)
-#remove comment ">::B >2419;"- this occurs when the microbial test has maxed out its count, as is confusing to non-DEQ folks
+#remove comment ">::B >2419;"- this occurs when the microbial test has maxed out its count, and is confusing to non-DEQ folks
 deqissues<-subset(issues,(!is.na(Activity_Comment.deq)
                           |!is.na(Result_Comment.deq))& !(Result_Comment.deq %in% ">::B >2419;"),
                   select=c(MLocID,Char_Name,Comment.deq))

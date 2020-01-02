@@ -18,13 +18,14 @@ source("W:/R_Scripts/ShinyNPDES_AWQMS/NameandFraction.R")
 #attempt to turn off scientific notation
 options(scipen=999)
 
-#in case the shinybusy package needs to be installed/reinstalled
+#in case the shinybusy package needs to be installed/reinstalled 
+#(this generates the "busy" spinning wheel on the webpage)
 #remotes::install_github("dreamRs/shinybusy")
 
 #Query the valid values
 
 # Check to see if saved cache of data exists. If it does not, or is greater than
-# 7 days old, query out stations and organizations and save the cache
+# 7 days old, query out stations, projects, and organizations and save the cache
 if(!file.exists("query_cache.RData") | 
    difftime(Sys.Date() ,file.mtime("query_cache.RData") , units = c("days")) > 7){
   
@@ -71,7 +72,7 @@ ui<-fluidPage(
                 label = "Select End Date",
                 min = '1900-1-1'),
       
-      #Orgs
+      #split organizations
       selectizeInput("orgs",
                      "Select Split Organization",
                      choices = organization,
@@ -88,7 +89,8 @@ ui<-fluidPage(
                      choices = station,
                      multiple = TRUE), 
       
-      #add action button, idea is to not run query until the button is clicked, otherwise it tries to query all AWQMS data at once and crashes
+      #add action button, idea is to not run query until the button is clicked, otherwise it tries to query all 
+      #AWQMS data at once and crashes
       actionButton("goButton","Run Query"),
       #add an excel download button
       downloadButton('downloadData', 'Download Data'),
@@ -131,7 +133,7 @@ ui<-fluidPage(
   server<-function(input,output) {
     
     #have to make dates into strings, otherwise they come out as funny numbers
-    #all other variables are reactive 'as is' except for reject button
+    #all other variables are reactive 'as is'
     #isolate data so that you have to click a button so that it runs the query using eventReactive.
     data<-eventReactive(input$goButton,{
       
@@ -189,7 +191,7 @@ ui<-fluidPage(
   
   output$splitData<-renderDataTable({splitData()})
   
-  #create tables of nonmatching data
+  #create table of nonmatching data
   
   nomatch<-eventReactive(input$goButton,{
     #combine name and fraction for deq and split data for better comparison
@@ -206,7 +208,7 @@ ui<-fluidPage(
 
   output$nomatchdeq<-renderDataTable({nomatch()})
   
-  #generate workbook to download
+  #generate workbook to download, easier to work with the data if needed
   dwnld<-eventReactive(input$goButton,{
     wb<-createWorkbook()
     
