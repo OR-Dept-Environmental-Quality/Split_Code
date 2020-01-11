@@ -146,7 +146,7 @@ spltcomp<-params$split
 spltcomp<-qc_issue(spltcomp)
 
 #add j flag to data below MRL for split data reported to MDL
-if (is.numeric(spltcomp$MDLValue)) {spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)}
+spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
