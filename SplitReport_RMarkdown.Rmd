@@ -438,3 +438,21 @@ kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRU
         column_spec(3,width="30em")
 } else cat("**No split data quality issues**")  
 ```
+
+# Subcontracted Analytes
+
+The following table outlines any analytes that were subcontracted to other labs by DEQ
+
+```{r echo=FALSE, results='asis'}
+sublab<-params$deq
+
+sublab<-namefrac(sublab)
+sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result","Result_Unit","Method_Code","Analytical_Lab"))
+
+names(sublab)<-c("Station","Analyte","Result","Unit","Method","Subcontract Lab")
+
+if(nrow(sublab)>0){
+kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"))
+} else cat("**No subcontracted analytes**")
+```
