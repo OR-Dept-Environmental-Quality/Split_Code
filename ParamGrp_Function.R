@@ -30,7 +30,7 @@ param_grp<-function(x){
   voc<-c("1,1,1,2-Tetrachloroethane", "1,1,1-Trichloroethane", "1,1,2,2-Tetrachloroethane", "1,1,2-Trichloroethane", "1,1-Dichloroethane", 
          "1,1-Dichloroethylene", "1,1-Dichloropropene", "1,2,3-Trichlorobenzene","1,2,3-Trichloropropane", "1,2,4-Trimethylbenzene", 
          "1,2-Dibromo-3-chloropropane", "1,2-Dichloroethane", "1,2-Dichloropropane","1,3-Dichlorobenzene", "1,3-Dichloropropane",
-         "1,3,5-Trimethylbenzene", "2,2-Dichloropropane","cis-1,2-Dichloroethylene","trans-1,2-Dichloroethylene", "Acetone", 
+         "1,3,5-Trimethylbenzene", "2,2-Dichloropropane","cis-1,2-Dichloroethylene","trans-1,2-Dichloroethylene", "Acetone","Acrylonitrile", 
          "Benzene", "Bromobenzene", "Carbon disulfide", "Carbon tetrachloride", "Chlorobenzene", "Chlorodibromomethane", "Chloroethane", 
          "Chloroform", "Chloromethane", "cis-1,3-Dichloropropene", "Cumene", "Dichlorobromomethane", "CFC-12",
          "Dibromomethane", "Ethylbenzene", "p-Cymene","tert-Butylbenzene","Vinyl chloride","Tribromomethane","Tetrachloroethene",
