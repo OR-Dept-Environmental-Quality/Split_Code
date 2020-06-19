@@ -23,3 +23,5 @@ qc_issue<-function(x) {
   #try1<-splitcomp(deqData,viewOrg)
   #try2<-qc_issue(try1)
   #see<-subset(try2,issue=="TRUE")
+
+#testing repo
