@@ -49,7 +49,10 @@ param_grp<-function(x){
            "Bis(2-chloroethyl) ether", "Bis(2-chloroisopropyl) ether", "Butyl benzyl phthalate", "Chrysene", "Di(2-ethylhexyl) adipate", 
            "Di(2-ethylhexyl) phthalate", "Dibenz[a,h]anthracene", "Dibenzofuran", "Dibutyl phthalate", "Diethyl phthalate", "Dimethyl phthalate",
            "Di-n-octyl phthalate", "Fluoranthene", "Fluorene", "Hexachlorobenzene",  "Hexachlorobutadiene", "Hexachlorocyclopentadiene", 
-           "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", "Naphthalene")
+           "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", "Naphthalene",'o-Chlorophenol' ,"o-Cresol",
+           "o-Nitrophenol" ,'4,6-Dinitro-o-cresol' , 'BDE-003' ,'p-Chloro-m-cresol','p-Chlorophenyl phenyl ether','p-Nitrophenol' ,
+           'Bis(2-chloro-1-methylethyl) ether','Nitrobenzene' ,'N-Nitrosodi-n-propylamine','N-Nitrosodiphenylamine',
+           'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene')
   
   #physical chemistry parameters (a little bit of a grab bag)
   phys<-c("Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
