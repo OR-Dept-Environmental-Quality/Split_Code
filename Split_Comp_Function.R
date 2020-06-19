@@ -7,7 +7,7 @@ splitcomp<-function(deq,splt)
   
   require(dplyr)
   require(stringr)
-  source("W:/R_Scripts/ShinyNPDES_AWQMS/NameandFraction.R")
+  source("NameandFraction.R")
 
   
 #####UNITS
