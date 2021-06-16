@@ -64,7 +64,7 @@ knitr::include_graphics("//deqhq1/ABRITS/GitHub/Split_Code/DEQ-logo-color-notran
 # Memorandum 
 
 ## `r paste("To: ",params$rep)`
-## From: Aliana Britson 
+## From: Victoria Avalos 
 
 # `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)`
 # `r paste("Report Date:", Sys.Date())`
