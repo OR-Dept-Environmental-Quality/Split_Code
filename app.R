@@ -40,7 +40,7 @@ if(!file.exists("query_cache.RData") |
   project<-AWQMS_Projects()
   project<-sort(project$Project)
   
-  
+
   save(project, station, organization, file = 'query_cache.RData')
 } else {
   load("query_cache.RData")
@@ -141,7 +141,7 @@ ui<-fluidPage(
       rendd<-toString(sprintf("%s",input$endd))
       
       #actual query for data
-      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,org=c(input$orgs,"OREGONDEQ"),project=c(input$project),station=c(input$monlocs))
+      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,org=c(input$orgs,"OREGONDEQ"),project=c(input$project),station=c(input$monlocs), filterQC = TRUE)
       
       dat
       
@@ -163,8 +163,8 @@ ui<-fluidPage(
     output$deqData<-renderDataTable({
       viewDEQ<-subset(deqData(),select=c(Org_Name,Project1,MLocID,StationDes,Lat_DD,Long_DD,act_id,SampleStartDate,SampleStartTime,SampleStartTZ,
                         SampleMedia,SampleSubmedia,Char_Name,Char_Speciation,Sample_Fraction,CASNumber,Result_status,Result_Type,
-                        Result,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
-                        Result_Comment,lab_Comments,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
+                        Result_Text,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
+                        Result_Comment,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
       viewDEQ
     })
     
@@ -178,8 +178,8 @@ ui<-fluidPage(
     output$orgData<-renderDataTable({
       subset(orgData(),select=c(Org_Name,Project1,MLocID,StationDes,Lat_DD,Long_DD,act_id,SampleStartDate,SampleStartTime,SampleStartTZ,
                         SampleMedia,SampleSubmedia,Char_Name,Char_Speciation,Sample_Fraction,CASNumber,Result_status,Result_Type,
-                        Result,Result_Operator,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
-                        Result_Comment,lab_Comments,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
+                        Result_Text,Result_Operator,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
+                        Result_Comment,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
     })
 
 
@@ -261,9 +261,7 @@ ui<-fluidPage(
                    perm=input$permittee,
                    rep=input$report,
                    comp=input$comp,
-                   conc=input$conc
-                   
-)
+                   conc=input$conc)
       
       rmarkdown::render(tempReport, output_file=file,
                         params=params,
