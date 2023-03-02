@@ -36,8 +36,8 @@ options(kableExtra.latex.load_packages=FALSE)
 library(kableExtra)
 library(tinytex)
 
-source("//deqhq1/ABRITS/GitHub/Split_Code/ParamGrp_Function.R")
-source("//deqhq1/ABRITS/GitHub/Split_Code/QC_Issue.R")
+source("//deqlab1/vavalos/Split_Code-master/ParamGrp_Function.R")
+source("//deqlab1/vavalos/Split_Code-master/QC_Issue.R")
 ```
 
 ```{r echo=FALSE}
@@ -56,8 +56,8 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 ```
 
 
-```{r logo, echo=FALSE,fig.align='left', out.width="400px",out.height="200px"}
-knitr::include_graphics("//deqhq1/ABRITS/GitHub/Split_Code/DEQ-logo-color-notransp-horiz750x156.png")
+```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
+knitr::include_graphics("//deqlab1/vavalos/Split_Code-master/DEQ-logo-color-notransp-horiz750x156.png")
 #
 ```
 
@@ -148,12 +148,12 @@ spltcomp<-params$split
 spltcomp<-qc_issue(spltcomp)
 
 #add j flag to data below MRL for split data reported to MDL
-spltcomp$Result.split<-ifelse(substr(spltcomp$Result.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result.split," J"),spltcomp$Result.split)
+spltcomp$Result_Text.split<-ifelse(substr(spltcomp$Result_Text.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result_Text.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result_Text.split," J"),spltcomp$Result_Text.split)
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
 if(unique(spltorg$Project1)=="Effluent Monitoring") {
-  iss<-subset(spltcomp,issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+  iss<-subset(spltcomp,issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
   
    #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" (need to do after param_grp function for names' sake)
@@ -189,7 +189,7 @@ spltcomp<-spltcomp%>%
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #VOCs
 #take rows where we have QC violations, only return columns we need (station, analyte, results, unit, and RPD/diff)
-voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
 #order by analyte
@@ -205,7 +205,7 @@ kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Uni
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #Semivolatiles
-semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
 semivol<-semivol[order(semivol$Char_Name),]
@@ -220,7 +220,7 @@ kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab",
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #Metals 
-metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result.deq,Result.split,
+metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,splitRPD,splitDiff))
 
 metals<-metals[order(metals$Char_Name),]
@@ -235,7 +235,7 @@ kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","
 
 if(unique(spltorg$Project1)=="Landfill Monitoring") {
 #Physical Chemistry
-phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,splitRPD,splitDiff))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
@@ -273,7 +273,7 @@ if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0)
 if(unique(spltorg$Project1)=="Landfill Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation
-spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,param_grp,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
@@ -329,7 +329,7 @@ for (i in 1:length(lstsplt)){
 if(unique(spltorg$Project1)=="Effluent Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation, and remove the speciation column
-spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result.deq,Result.split,
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
                                  Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
@@ -348,7 +348,7 @@ spltrp<-spltrp%>%
   mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
 
 #this table is huge and unwieldy, try splitting it down by station/date/time
-spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate,spltrp$SampleStartTime)
+spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate, spltrp$SampleStartTime.deq)
 lstsplt<-split(spltrp,spltrp$stdttm)
 
 for (i in 1:length(lstsplt)){
@@ -449,9 +449,9 @@ The following table outlines any analytes that were subcontracted to other labs 
 sublab<-params$deq
 
 sublab<-namefrac(sublab)
-sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result","Result_Unit","Method_Code","Analytical_Lab"))
+sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result_Text","Result_Unit","Method_Code","Analytical_Lab"))
 
-names(sublab)<-c("Station","Analyte","Result","Unit","Method","Subcontract Lab")
+names(sublab)<-c("Station","Analyte","Result_Text","Unit","Method","Subcontract Lab")
 
 if(nrow(sublab)>0){
 kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%

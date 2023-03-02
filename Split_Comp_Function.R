@@ -49,7 +49,7 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
   
 
 
-  #need to add a column to determine what type of QC is needed (eg. RPD, Diff, Microdiff)
+  #need to add a column to determine what type of QC is needed (eg. RPA, Diff, Microdiff)
   #difference is done when data is less than 5x MRL. don't always get MRL from split lab, use ours to be safe
   jn$qctype<-case_when(jn$Char_Name=="Enterococcus"|jn$Char_Name=="Escherichia coli"|jn$Char_Name=="Fecal Coliform"|jn$Char_Name=="Total Coliform"~"Micro",
                        jn$Char_Name==c("pH")|jn$Result_Numeric.deq<=(5*jn$MRLValue.deq)|jn$Result_Numeric.split<=(5*jn$MRLValue.deq)~"Diff",
@@ -104,7 +104,7 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
   #won't include lab comments- they are generic language set by AWQMS and not very helpful
   jn<-subset(jn,select=c("MLocID","Activity_Type","SampleStartDate","SampleStartTime.deq","Char_Name","StationDes.deq",
                          "Char_Speciation.deq","Result_status.deq","Result_status.split",
-                         "Result_Type.deq","Result_Type.split","Result.deq","Result.split",
+                         "Result_Type.deq","Result_Type.split","Result_Text.deq","Result_Text.split",
                          "Result_Unit.deq","Result_Unit.split","Method_Code.deq","Method_Code.split",
                          "Activity_Comment.deq","Result_Comment.deq","Activity_Comment.split","Result_Comment.split",
                          "MRLType.deq","MRLValue.deq","MRLUnit.deq","MRLType.split","MRLValue.split","MRLUnit.split",
