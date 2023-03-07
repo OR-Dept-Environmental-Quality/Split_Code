@@ -36,8 +36,8 @@ options(kableExtra.latex.load_packages=FALSE)
 library(kableExtra)
 library(tinytex)
 
-source("//deqlab1/vavalos/Split_Code-master/ParamGrp_Function.R")
-source("//deqlab1/vavalos/Split_Code-master/QC_Issue.R")
+source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
+source("C:/Users/dbrown/Split_Code/QC_Issue.R")
 ```
 
 ```{r echo=FALSE}
@@ -57,7 +57,7 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 
 
 ```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
-knitr::include_graphics("//deqlab1/vavalos/Split_Code-master/DEQ-logo-color-notransp-horiz750x156.png")
+knitr::include_graphics("C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png")
 #
 ```
 
