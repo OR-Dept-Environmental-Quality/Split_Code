@@ -22,15 +22,21 @@ spltunit<-unique(spltunit)
 unjn<-inner_join(dequnit,spltunit,by=c("Char_Name"),suffix=c(".deq",".splt"))
 unjn<-subset(unjn, unjn$Result_Unit.splt!=unjn$Result_Unit.deq)
 
-#get characteristics where we need to convert from mg to ug and also from ug to mg 
+#get characteristics where we need to convert from mg to ug and also from ug to mg
+#add ng/L as well
 #(the most likely units conversions needed, will add more as necessary)
 mgug<-subset(unjn, unjn$Result_Unit.splt=="mg/l" & unjn$Result_Unit.deq=="ug/l")
 ugmg<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="mg/l")
+ngug<-subset(unjn, unjn$Result_Unit.splt=="ng/l" & unjn$Result_Unit.deq=="ug/l")
+ugng<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="ng/l")
 
 #if there are any rows in mgug or ugmg then run data through unit conversion function
+#add ngug and ugng
+
 if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,"mg/l","ug/l")}
 if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
-  
+if (nrow(ngug)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ng/l","ug/l")}
+if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","ng/l")}  
 
 ###JOIN DEQ AND SPLIT DATA
 #use namfrac function to get fraction as part of name for Metals 
