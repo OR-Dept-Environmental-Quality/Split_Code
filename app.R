@@ -3,6 +3,9 @@
 #put all data into AWQMS, pull data from AWQMS and the compare in R
 #use a Shiny app to pull out data, view comparison, then use R Markdown to create a report
 
+#To capture any updates to the AWQMSdata package, run this line periodically
+#devtools::install_github("TravisPritchardODEQ/AWQMSdata",dependencies = TRUE, force = TRUE, upgrade = FALSE)
+
 print("Initial data queries may take a few minutes.")
 
 library(shiny)

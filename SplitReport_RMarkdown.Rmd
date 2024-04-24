@@ -64,7 +64,7 @@ knitr::include_graphics("C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-hori
 # Memorandum 
 
 ## `r paste("To: ",params$rep)`
-## From: Victoria Avalos 
+## From: Kat Maloney 
 
 # `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)`
 # `r paste("Report Date:", Sys.Date())`
