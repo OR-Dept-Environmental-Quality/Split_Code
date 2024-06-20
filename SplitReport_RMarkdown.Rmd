@@ -43,7 +43,7 @@ source("C:/Users/dbrown/Split_Code/QC_Issue.R")
 ```{r echo=FALSE}
 #get organization name, lab used, sample dates
 spltorg<-params$org
-spltorgnm<-unique(spltorg$Org_Name)
+spltorgnm<-unique(spltorg$OrganizationID)
 spltlabnm<-unique(spltorg$Analytical_Lab)
   
 dates<-sort(unique(spltorg$SampleStartDate))
