@@ -75,7 +75,7 @@ param_grp<-function(x){
 }
 
 #library(AWQMSdata)
-#test<-AWQMS_Data(startdate='2018-05-01', enddate='2018-05-03',org=c("OREGONDEQ","RVBND_LF(NOSTORETID)"),project = "Landfill Monitoring")
+#test<-AWQMS_Data(startdate='2022-04-21', enddate='2022-04-21',OrganizationID=c("OREGONDEQ","FLORENCE_LF(NOSTORETID)"),project = "Landfill Monitoring")
 
 #try<-param_grp(test)
 
