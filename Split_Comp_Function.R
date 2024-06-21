@@ -131,15 +131,15 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
 
 
 #test dataset
-#library(AWQMSdata)
-#dat<-AWQMS_Data(startdate='2019-07-23',enddate='2019-07-23',project='Landfill Monitoring',org=c('OREGONDEQ','NEWBERG_LF(NOSTORETID)'))
-#deq<-subset(dat,OrganizationID=='OREGONDEQ')
-#splt<-subset(dat,OrganizationID=='NEWBERG_LF(NOSTORETID)')
-
-#test<-splitcomp(deq,rvb)
-
-#nomatch<-full_join(deq,rvb,by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split") )
-#nomatch<-subset(nomatch, is.na(OrganizationID.split)|is.na(OrganizationID.deq))
-#nomatch<-subset(nomatch,select=c("OrganizationID.split","OrganizationID.deq",'MLocID',"SampleStartDate","Char_Name","Activity_Type"))
-
+# library(AWQMSdata)
+# dat<-AWQMS_Data(startdate='2022-04-21',enddate='2022-04-21',project='Landfill Monitoring',OrganizationID=c('OREGONDEQ','FLORENCE_LF(NOSTORETID)'))
+# deq<-subset(dat,OrganizationID=='OREGONDEQ')
+# splt<-subset(dat,OrganizationID=='FLORENCE_LF(NOSTORETID)')
+# 
+# test<-splitcomp(deq,splt)
+# 
+# nomatch<-full_join(deq,splt,by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split") )
+# nomatch<-subset(nomatch, is.na(OrganizationID.split)|is.na(OrganizationID.deq))
+# nomatch<-subset(nomatch,select=c("OrganizationID.split","OrganizationID.deq",'MLocID',"SampleStartDate","Char_Name","Activity_Type"))
+# 
 
