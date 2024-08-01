@@ -279,12 +279,19 @@ if(unique(spltorg$Project1)=="Landfill Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
-                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% #changed to add param_grp
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% 
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% 
+  
+  
+  #changed to add param_grp
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+
 
 #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" and shorten various other names
 spltrp<-spltrp%>%
@@ -400,10 +407,8 @@ The following tables outline data qualifications or comments noted by either the
 issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(Activity_Comment.split)
                           |!is.na(Result_Comment.split)) %>%
                mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
-               select(-Char_Speciation.deq)
-
-#reformat date
-issues$SampleStartDate<-format(issues$SampleStartDate,format="%m-%d-%Y")
+               select(-Char_Speciation.deq) %>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
 
 #combine all comments into one row for deq and for split lab
 issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
