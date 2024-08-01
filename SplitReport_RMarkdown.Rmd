@@ -30,20 +30,23 @@ library(tidyverse)
 #library(ragtop) #for is.blank function
 
 
+
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
 options(kableExtra.latex.load_packages=FALSE)
 library(kableExtra)
 library(tinytex)
 
-source("ParamGrp_Function.R")
-source("QC_Issue.R")
+#these are local files
+source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/ParamGrp_Function.R")
+source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/QC_Issue.R")
+logo <- "C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
 ```{r echo=FALSE}
 #get organization name, lab used, sample dates
 spltorg<-params$org
-spltorgnm<-unique(spltorg$OrganizationID)
+spltorgnm<-unique(spltorg$org_name)
 spltlabnm<-unique(spltorg$Analytical_Lab)
   
 dates<-sort(unique(spltorg$SampleStartDate))
@@ -57,7 +60,9 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 
 
 ```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
-knitr::include_graphics("DEQ-logo-color-notransp-horiz750x156.png")
+
+#logo defined at the top
+knitr::include_graphics(logo)
 #
 ```
 
@@ -81,9 +86,9 @@ options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
 deqdat<-params$split
 
-meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq)))
-#reformat date
-meta$SampleStartDate<-format(meta$SampleStartDate,format="%m-%d-%Y")
+meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq))) %>%
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
 
 kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"))
@@ -451,7 +456,7 @@ sublab<-params$deq
 sublab<-namefrac(sublab)
 sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result_Text","Result_Unit","Method_Code","Analytical_Lab"))
 
-names(sublab)<-c("Station","Analyte","Result_Text","Unit","Method","Subcontract Lab")
+names(sublab)<-c("Station","Analyte","Result","Unit","Method","Subcontract Lab")
 
 if(nrow(sublab)>0){
 kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
