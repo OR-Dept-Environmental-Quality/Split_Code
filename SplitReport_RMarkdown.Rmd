@@ -30,20 +30,23 @@ library(tidyverse)
 #library(ragtop) #for is.blank function
 
 
+
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
 options(kableExtra.latex.load_packages=FALSE)
 library(kableExtra)
 library(tinytex)
 
-source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
-source("C:/Users/dbrown/Split_Code/QC_Issue.R")
+#these are local files
+source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/ParamGrp_Function.R")
+source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/QC_Issue.R")
+logo <- "C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
 ```{r echo=FALSE}
 #get organization name, lab used, sample dates
 spltorg<-params$org
-spltorgnm<-unique(spltorg$OrganizationID)
+spltorgnm<-unique(spltorg$org_name)
 spltlabnm<-unique(spltorg$Analytical_Lab)
   
 dates<-sort(unique(spltorg$SampleStartDate))
@@ -57,7 +60,9 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 
 
 ```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
-knitr::include_graphics("C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png")
+
+#logo defined at the top
+knitr::include_graphics(logo)
 #
 ```
 
@@ -81,9 +86,9 @@ options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
 deqdat<-params$split
 
-meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq)))
-#reformat date
-meta$SampleStartDate<-format(meta$SampleStartDate,format="%m-%d-%Y")
+meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq))) %>%
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
 
 kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"))
@@ -274,12 +279,19 @@ if(unique(spltorg$Project1)=="Landfill Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
-                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% #changed to add param_grp
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% 
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% 
+  
+  
+  #changed to add param_grp
   mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
 #reformat date
 spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+
 
 #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" and shorten various other names
 spltrp<-spltrp%>%
@@ -330,8 +342,8 @@ if(unique(spltorg$Project1)=="Effluent Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation, and remove the speciation column
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
-                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
-  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
 #make split lab LOQ 'NR' if not reported
@@ -395,10 +407,8 @@ The following tables outline data qualifications or comments noted by either the
 issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(Activity_Comment.split)
                           |!is.na(Result_Comment.split)) %>%
                mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
-               select(-Char_Speciation.deq)
-
-#reformat date
-issues$SampleStartDate<-format(issues$SampleStartDate,format="%m-%d-%Y")
+               select(-Char_Speciation.deq) %>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
 
 #combine all comments into one row for deq and for split lab
 issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
@@ -451,7 +461,7 @@ sublab<-params$deq
 sublab<-namefrac(sublab)
 sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result_Text","Result_Unit","Method_Code","Analytical_Lab"))
 
-names(sublab)<-c("Station","Analyte","Result_Text","Unit","Method","Subcontract Lab")
+names(sublab)<-c("Station","Analyte","Result","Unit","Method","Subcontract Lab")
 
 if(nrow(sublab)>0){
 kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
