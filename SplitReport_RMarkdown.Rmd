@@ -342,8 +342,8 @@ if(unique(spltorg$Project1)=="Effluent Monitoring")
 {
 #get subset of columns, combine characteristic name and speciation, and remove the speciation column
 spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
-                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>%
-  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
   select(-Char_Speciation.deq)
 
 #make split lab LOQ 'NR' if not reported
