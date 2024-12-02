@@ -35,8 +35,8 @@ ugng<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="ng/l")
 
 if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,"mg/l","ug/l")}
 if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
-if (nrow(ngug)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ng/l","ug/l")}
-if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","ng/l")}  
+if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,"ng/l","ug/l")} # changed column to ngug$Char_Name from ugmg$Char_Name - DTB 112024
+if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,"ug/l","ng/l")} # changed column to ugng$Char_Name from ugmg$Char_Name - DTB 112024
 
 ###JOIN DEQ AND SPLIT DATA
 #use namfrac function to get fraction as part of name for Metals 
