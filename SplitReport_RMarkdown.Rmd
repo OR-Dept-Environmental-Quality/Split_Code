@@ -38,9 +38,9 @@ library(kableExtra)
 library(tinytex)
 
 #these are local files
-source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/ParamGrp_Function.R")
-source("C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/QC_Issue.R")
-logo <- "C:/Users/cthomas/Documents/local_R_resources/scripts/Split_Code/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
+source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
+source("C:/Users/dbrown/Split_Code/QC_Issue.R")
+logo <- "C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
 ```{r echo=FALSE}
@@ -153,7 +153,13 @@ spltcomp<-params$split
 spltcomp<-qc_issue(spltcomp)
 
 #add j flag to data below MRL for split data reported to MDL
-spltcomp$Result_Text.split<-ifelse(substr(spltcomp$Result_Text.split,start=1,stop=1)!="<" & (as.numeric(spltcomp$Result_Text.split)<=spltcomp$MRLValue.split) ,paste0(spltcomp$Result_Text.split," J"),spltcomp$Result_Text.split)
+spltcomp$Result_Text.split<-ifelse(
+  substr(spltcomp$Result_Text.split,start=1,stop=1) !="<" & (
+    (!is.na(spltcomp$MRLValue.split) & as.numeric(spltcomp$Result_Text.split) <= spltcomp$MRLValue.split) |
+    (is.na(spltcomp$MRLValue.split) & as.numeric(spltcomp$Result_Text.split) <= spltcomp$MRLValue.deq)
+    ), 
+  paste0(spltcomp$Result_Text.split," J"),
+  spltcomp$Result_Text.split)
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
