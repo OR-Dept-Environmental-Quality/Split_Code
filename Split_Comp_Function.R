@@ -8,7 +8,7 @@ splitcomp<-function(deq,splt)
   require(dplyr)
   require(stringr)
   source("NameandFraction.R")
-
+  source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/heads/master/R/Unit_Convert.R") # conversions in lines 36-39 weren't working without this DTB 1/6/25
   
 #####UNITS
 #convert units so they match DEQ's data (NOTE: THIS NEEDS MORE TESTING TO MAKE SURE THE CODE WORKS PROPERLY)
@@ -23,12 +23,12 @@ unjn<-inner_join(dequnit,spltunit,by=c("Char_Name"),suffix=c(".deq",".splt"))
 unjn<-subset(unjn, unjn$Result_Unit.splt!=unjn$Result_Unit.deq)
 
 #get characteristics where we need to convert from mg to ug and also from ug to mg
-#add ng/L as well
+#added tolower() to each line to make these case insensitive - DTB 1/6/25
 #(the most likely units conversions needed, will add more as necessary)
-mgug<-subset(unjn, unjn$Result_Unit.splt=="mg/l" & unjn$Result_Unit.deq=="ug/l")
-ugmg<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="mg/l")
-ngug<-subset(unjn, unjn$Result_Unit.splt=="ng/l" & unjn$Result_Unit.deq=="ug/l")
-ugng<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="ng/l")
+mgug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
+ugmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
+ngug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
+ugng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
 
 #if there are any rows in mgug or ugmg then run data through unit conversion function
 #add ngug and ugng

@@ -6,6 +6,8 @@ source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
 source("C:/Users/dbrown/Split_Code/QC_Issue.R")
 source("C:/Users/dbrown/Split_Code/Split_Comp_Function.R")
 source("C:/Users/dbrown/Split_Code/NameandFraction.R")
+source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/heads/master/R/Unit_Convert.R")
+
 
 # Enter parameters for data pull
 StDate <- '2023-07-05'
@@ -46,10 +48,10 @@ unjn<-subset(unjn, unjn$Result_Unit.splt!=unjn$Result_Unit.deq)
 #get characteristics where we need to convert from mg to ug and also from ug to mg
 #add ng/L as well
 #(the most likely units conversions needed, will add more as necessary)
-mgug<-subset(unjn, unjn$Result_Unit.splt=="mg/l" & unjn$Result_Unit.deq=="ug/l")
-ugmg<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="mg/l")
-ngug<-subset(unjn, unjn$Result_Unit.splt=="ng/l" & unjn$Result_Unit.deq=="ug/l")
-ugng<-subset(unjn, unjn$Result_Unit.splt=="ug/l" & unjn$Result_Unit.deq=="ng/l")
+mgug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
+ugmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
+ngug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
+ugng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
 
 #if there are any rows in mgug or ugmg then run data through unit conversion function
 #add ngug and ugng
