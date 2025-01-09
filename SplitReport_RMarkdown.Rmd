@@ -140,7 +140,7 @@ calculation of the difference. Microbiology parameters are acceptable when the a
 # Summary
 
 ## *Comparison Limit Tables* 
-The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits.
+The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits. Note: For non-detects when method detection limit was provided to DEQ in the electronic data delivery form, calculations in this summary table may appear inaccurate. See Full Split Sample Report tables for method reporting limits.
 
 
 ```{r echo=FALSE, results='asis', warning=FALSE}
@@ -276,7 +276,7 @@ if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0)
 
 `r params$conc`
 
-# Split Sample Report
+# Full Split Sample Report
 
 ```{r echo=FALSE, results='asis'}
 
