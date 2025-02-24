@@ -10,10 +10,10 @@ source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/hea
 
 
 # Enter parameters for data pull
-StDate <- '2023-07-05'
-EndDate <- '2023-07-07'
-Project <- 'Effluent Monitoring'
-SplOrg <- 'CITY_RAINIER(NOSTORETID)'
+StDate <- '2022-09-20'
+EndDate <- '2022-09-20'
+Project <- 'Landfill Monitoring'
+SplOrg <- 'WEYCO_NOBEND_LF(NOSTORETID)'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(SplOrg, 'OREGONDEQ'),
