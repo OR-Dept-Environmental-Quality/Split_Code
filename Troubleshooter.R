@@ -10,10 +10,10 @@ source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/hea
 
 
 # Enter parameters for data pull
-StDate <- '2022-09-20'
-EndDate <- '2022-09-20'
+StDate <- '2022-05-10'
+EndDate <- '2022-05-11'
 Project <- 'Landfill Monitoring'
-SplOrg <- 'WEYCO_NOBEND_LF(NOSTORETID)'
+SplOrg <- 'SCOASTLUMBER_LF(NOSTORETID)'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(SplOrg, 'OREGONDEQ'),
@@ -80,7 +80,9 @@ jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity
 
 #need to add a column to determine what type of QC is needed (eg. RPA, Diff, Microdiff)
 #difference is done when data is less than 5x MRL. don't always get MRL from split lab, use ours to be safe
-jn$qctype<-case_when(jn$Char_Name=="Enterococcus"|jn$Char_Name=="Escherichia coli"|jn$Char_Name=="Fecal Coliform"|jn$Char_Name=="Total Coliform"~"Micro",
+jn$qctype<-case_when(jn$Result_Operator.split=="<" & jn$Result_Numeric.deq < jn$MRLValue.split ~ NA,
+                     jn$Result_Operator.deq=="<" &jn$Result_Numeric.split < jn$MRLValue.deq ~ NA,
+                     jn$Char_Name=="Enterococcus"|jn$Char_Name=="Escherichia coli"|jn$Char_Name=="Fecal Coliform"|jn$Char_Name=="Total Coliform"~"Micro",
                      jn$Char_Name==c("pH")|jn$Result_Numeric.deq<=(5*jn$MRLValue.deq)|jn$Result_Numeric.split<=(5*jn$MRLValue.deq)~"Diff",
                      jn$Result_Numeric.deq>(5*jn$MRLValue.deq)& jn$Result_Numeric.split>(5*jn$MRLValue.deq) ~"RPD"
 )
