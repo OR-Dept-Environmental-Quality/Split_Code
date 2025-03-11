@@ -43,7 +43,7 @@ source("C:/Users/dbrown/Split_Code/QC_Issue.R")
 logo <- "C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
-```{r echo=FALSE}
+```{r Gather Information, echo=FALSE}
 #get organization name, lab used, sample dates
 spltorg<-params$org
 spltorgnm<-unique(spltorg$org_name)
@@ -59,7 +59,7 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 ```
 
 
-```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
+```{r logo, echo=FALSE, fig.align='left', message=FALSE, warning=FALSE, out.height="200px", out.width="400px"}
 
 #logo defined at the top
 knitr::include_graphics(logo)
@@ -79,7 +79,7 @@ knitr::include_graphics(logo)
 
 This report compares the analytical results between Oregon DEQ and `r spltlabnm` for `r spltorgnm` performed on the dates and locations outlined in Table 1. 
 
-```{r echo=FALSE, results='asis'}
+```{r Sampling Location Table, echo=FALSE, results='asis'}
 
 options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
@@ -99,7 +99,7 @@ kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.n
 The following tables are grouped by analyte type and only contain data where the calculated quality assurance values were outside of acceptable criteria limits. See Full Split Sample Report tables for method reporting limits.
 
 
-```{r echo=FALSE, results='asis', warning=FALSE}
+```{r Excursion Table Setup, echo=FALSE, warning=FALSE, results='asis'}
 #create summary tables of what is out of QC 
 
 #need full split report
@@ -234,7 +234,7 @@ if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0)
 
 # Full Split Sample Report
 
-```{r echo=FALSE, results='asis'}
+```{r Full Sample Report Table Setup, echo=FALSE, results='asis'}
 
 
 if(unique(spltorg$Project1)=="Landfill Monitoring")
