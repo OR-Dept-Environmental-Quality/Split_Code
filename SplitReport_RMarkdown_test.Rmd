@@ -164,7 +164,7 @@ voc<-voc[order(voc$Char_Name),]
   
 if(nrow(voc)>0){
 kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -179,7 +179,7 @@ semivol<-semivol[order(semivol$Char_Name),]
 
 if(nrow(semivol)>0){
 kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -194,7 +194,7 @@ metals<-metals[order(metals$Char_Name),]
 
 if(nrow(metals)>0){
 kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -211,7 +211,7 @@ phys<-phys[order(phys$Char_Name),]
 
 if(nrow(phys)>0){
 kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -285,6 +285,12 @@ for (i in 1:length(lstsplt)){
   #so we create MRLNum variable to use and then hide the column later
   lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
   lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
+  
+  if (grp == "Physical Chem") {
+    extra_text <- " \\newline DEQ Nitrate + Nitrite compared to Split Org Nitrate where applicable"
+} else {
+    extra_text <- ""
+}
   
   print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
             caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
