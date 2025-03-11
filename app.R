@@ -254,13 +254,13 @@ ui<-fluidPage(
   
   #R markdown report
   output$report<-downloadHandler(
-    filename = function() {paste(Sys.Date() ,"_SplitReport_test.pdf", sep="")},
+    filename = function() {paste(Sys.Date() ,"_SplitReport.pdf", sep="")},
     content=function(file){
       
       #create a file in a temporary directory
-      tempReport<-file.path(tempdir(),"SplitReport_Rmarkdown_test.Rmd")
+      tempReport<-file.path(tempdir(),"SplitReport_Rmarkdown.Rmd")
       #copy our report to the temporary directory file
-      file.copy("SplitReport_Rmarkdown_test.Rmd",tempReport,overwrite=TRUE)
+      file.copy("SplitReport_Rmarkdown.Rmd",tempReport,overwrite=TRUE)
       
       #create list of characteristics
       #set up parameters to pass to our Rmd document
