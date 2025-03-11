@@ -147,7 +147,9 @@ ui<-fluidPage(
       rendd<-toString(sprintf("%s",input$endd))
       
       #actual query for data
-      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,OrganizationID = c(input$orgs,"OREGONDEQ"),project=c(input$project),MLocID = c(input$monlocs), filterQC = TRUE)
+      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,OrganizationID = c(input$orgs,"OREGONDEQ"),
+                      project=c(input$project),MLocID = c(input$monlocs), filterQC = FALSE) %>%
+        filter(MLocID != '10000-ORDEQ')
       
       dat
       
@@ -170,7 +172,9 @@ ui<-fluidPage(
       viewDEQ<-subset(deqData(),select=c(OrganizationID,Project1,MLocID,StationDes,Lat_DD,Long_DD,act_id,SampleStartDate,SampleStartTime,SampleStartTZ,
                         SampleMedia,SampleSubmedia,Char_Name,Char_Speciation,Sample_Fraction,CASNumber,Result_status,Result_Type,
                         Result_Text,Result_Unit,Method_Code,Method_Context,Analytical_Lab,Activity_Comment,
-                        Result_Comment,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit))
+                        Result_Comment,QualifierAbbr,MDLType,MDLValue,MDLUnit,MRLType,MRLValue,MRLUnit)) #%>%
+        #filter(MLocID != '10000-ORDEQ')
+      
       viewDEQ
     })
     
@@ -250,13 +254,13 @@ ui<-fluidPage(
   
   #R markdown report
   output$report<-downloadHandler(
-    filename = function() {paste(Sys.Date() ,"_SplitReport.pdf", sep="")},
+    filename = function() {paste(Sys.Date() ,"_SplitReport_test.pdf", sep="")},
     content=function(file){
       
       #create a file in a temporary directory
-      tempReport<-file.path(tempdir(),"SplitReport_Rmarkdown.Rmd")
+      tempReport<-file.path(tempdir(),"SplitReport_Rmarkdown_test.Rmd")
       #copy our report to the temporary directory file
-      file.copy("SplitReport_Rmarkdown.Rmd",tempReport,overwrite=TRUE)
+      file.copy("SplitReport_Rmarkdown_test.Rmd",tempReport,overwrite=TRUE)
       
       #create list of characteristics
       #set up parameters to pass to our Rmd document
