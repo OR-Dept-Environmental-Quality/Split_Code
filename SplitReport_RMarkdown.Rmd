@@ -43,7 +43,7 @@ source("C:/Users/dbrown/Split_Code/QC_Issue.R")
 logo <- "C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
-```{r echo=FALSE}
+```{r Gather Information, echo=FALSE}
 #get organization name, lab used, sample dates
 spltorg<-params$org
 spltorgnm<-unique(spltorg$org_name)
@@ -59,7 +59,7 @@ wrkrdr<-unique(substr(deqorg$act_id,1,7))
 ```
 
 
-```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
+```{r logo, echo=FALSE, fig.align='left', message=FALSE, warning=FALSE, out.height="200px", out.width="400px"}
 
 #logo defined at the top
 knitr::include_graphics(logo)
@@ -79,8 +79,7 @@ knitr::include_graphics(logo)
 
 This report compares the analytical results between Oregon DEQ and `r spltlabnm` for `r spltorgnm` performed on the dates and locations outlined in Table 1. 
 
-
-```{r echo=FALSE, results='asis'}
+```{r Sampling Location Table, echo=FALSE, results='asis'}
 
 options(knitr.kable.NA='')
 # need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
@@ -93,57 +92,14 @@ meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,Sample
 kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
         kable_styling(latex_options=c("HOLD_position","striped"))
 ```
-# Review of Laboratory QA/QC Data
-
-``` {r echo=FALSE, results='asis'}
-
-if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",paste(as.character(spltlabnm),collapse="/"),
-" which have been reviewed carefully for completeness, precision and accuracy. The quality control
-elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
-Control Sample for most analysis.
-
-Method Blank (MB): Analyte concentrations in blank samples should fall below the laboratory's reporting
-limit or be less than 10% of the lowest reported concentration in the sample batch.
-
-Laboratory Control Sample (LCS): A laboratory control sample (LCS) consisting of a controlled/known
-concentration should be analyzed and pass the appropriate QC limits for all analytes. These samples are used to
-assess the overall method performance and are the primary indicator of laboratory performance.
-
-Matrix Spike (MS): A Matrix Spike should be completed with each sample batch to indicate the presence of
-possible interferences. The MS results are examined to evaluate the impact of matrix effects on the
-environmental sample that was spiked.
-
-Duplicates (DUP): Laboratory replicates should be analyzed with each analytical batch and fall within the
-laboratory's QC limits. Analytical duplicates would be evaluated for consistency/comparability in analytical
-results. A Laboratory Control Sample Duplicate (LCSD) or Matrix Spike Duplicate (MSD) may be used to meet
-this criterion.")}
-
-if(unique(spltorg$Project1)=="Effluent Monitoring"|unique(spltorg$Project1=="Landfill Monitoring")) {cat("
-
-*__Comparison Criteria__*
-
-The Split Sample Quality Assurance report compares laboratory measurements using different analytical methods and/or laboratories.
-The laboratory measurements are compared by one of two methods based on the samples' concentrations relative to the laboratory
-Method Reporting Limit (MRL) for that analyte.
-
-Difference: When one or both of the duplicates are less than five times the MRL, the values are compared by difference. The results are
-acceptable when the difference between the samples is less than twice the MRL. In the event that the split lab reports to the MDL, differences for reported values that fall between the MDL and the MRL (aka 'J flag' results) will be shown for informational purposes only.
-
-RPD: When both of the duplicate samples are greater than or equal to five times the MRL, the values are compared using the relative
-percent difference between the samples. The RPD is determined as the difference between the samples divided by the average of the
-values. Acceptable field duplicates have an absolute RPD of 30% or less.
-
-Microbiology parameters are always compared by difference. However, the bacteria counts are transformed to log values prior to
-calculation of the difference. Microbiology parameters are acceptable when the absolute difference of the log values is less than 0.6.")}
-```
 
 # Summary
 
-## *Comparison Limit Tables* 
-The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits. Note: For non-detects when method detection limit was provided to DEQ in the electronic data delivery form, calculations in this summary table may appear inaccurate. See Full Split Sample Report tables for method reporting limits.
+## *Consolidated Excursion Tables* 
+The following tables are grouped by analyte type and only contain data where the calculated quality assurance values were outside of acceptable criteria limits. See Full Split Sample Report tables for method reporting limits.
 
 
-```{r echo=FALSE, results='asis', warning=FALSE}
+```{r Excursion Table Setup, echo=FALSE, warning=FALSE, results='asis'}
 #create summary tables of what is out of QC 
 
 #need full split report
@@ -208,7 +164,7 @@ voc<-voc[order(voc$Char_Name),]
   
 if(nrow(voc)>0){
 kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -223,7 +179,7 @@ semivol<-semivol[order(semivol$Char_Name),]
 
 if(nrow(semivol)>0){
 kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -238,7 +194,7 @@ metals<-metals[order(metals$Char_Name),]
 
 if(nrow(metals)>0){
 kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -255,7 +211,7 @@ phys<-phys[order(phys$Char_Name),]
 
 if(nrow(phys)>0){
 kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
-  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  kable_styling(latex_options=c("HOLD_position", "striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
   column_spec(3:7,width="5em")}
@@ -268,17 +224,17 @@ if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0)
 
 ```
 
-## *Comparison*
+<!-- ## *Conclusion* -->
+
+<!-- `r params$conc` -->
+
+# Comparison
 
 `r params$comp`
 
-## *Conclusion*
-
-`r params$conc`
-
 # Full Split Sample Report
 
-```{r echo=FALSE, results='asis'}
+```{r Full Sample Report Table Setup, echo=FALSE, results='asis'}
 
 
 if(unique(spltorg$Project1)=="Landfill Monitoring")
@@ -331,7 +287,9 @@ for (i in 1:length(lstsplt)){
   lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
   
   print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
-            caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+            caption=paste(station,',',date,',',time,grp, 
+                          ifelse(grp == "Physical Chem", "***DEQ Nitrate+Nitrite compared to Split Lab Nitrate, when applicable***",
+                                 "")),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
         column_spec(1,width="10em") %>%
@@ -473,4 +431,48 @@ if(nrow(sublab)>0){
 kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
   kable_styling(latex_options=c("HOLD_position","striped","repeat_header"))
 } else cat("**No subcontracted analytes**")
+```
+
+# Review of Laboratory QA/QC Data
+
+``` {r echo=FALSE, results='asis'}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",paste(as.character(spltlabnm),collapse="/"),
+" which have been reviewed carefully for completeness, precision and accuracy. The quality control
+elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
+Control Sample for most analysis.
+
+Method Blank (MB): Analyte concentrations in blank samples should fall below the laboratory's reporting
+limit or be less than 10% of the lowest reported concentration in the sample batch.
+
+Laboratory Control Sample (LCS): A laboratory control sample (LCS) consisting of a controlled/known
+concentration should be analyzed and pass the appropriate QC limits for all analytes. These samples are used to
+assess the overall method performance and are the primary indicator of laboratory performance.
+
+Matrix Spike (MS): A Matrix Spike should be completed with each sample batch to indicate the presence of
+possible interferences. The MS results are examined to evaluate the impact of matrix effects on the
+environmental sample that was spiked.
+
+Duplicates (DUP): Laboratory replicates should be analyzed with each analytical batch and fall within the
+laboratory's QC limits. Analytical duplicates would be evaluated for consistency/comparability in analytical
+results. A Laboratory Control Sample Duplicate (LCSD) or Matrix Spike Duplicate (MSD) may be used to meet
+this criterion.")}
+
+if(unique(spltorg$Project1)=="Effluent Monitoring"|unique(spltorg$Project1=="Landfill Monitoring")) {cat("
+
+*__Comparison Criteria__*
+
+The Split Sample Quality Assurance report compares laboratory measurements using different analytical methods and/or laboratories.
+The laboratory measurements are compared by one of two methods based on the samples' concentrations relative to the laboratory
+Method Reporting Limit (MRL) for that analyte.
+
+Difference: When one or both of the duplicates are less than five times the MRL, the values are compared by difference. The results are
+acceptable when the difference between the samples is less than twice the MRL. In the event that the split lab reports to the MDL, differences for reported values that fall between the MDL and the MRL (aka 'J flag' results) will be shown for informational purposes only.
+
+RPD: When both of the duplicate samples are greater than or equal to five times the MRL, the values are compared using the relative
+percent difference between the samples. The RPD is determined as the difference between the samples divided by the average of the
+values. Acceptable field duplicates have an absolute RPD of 30% or less.
+
+Microbiology parameters are always compared by difference. However, the bacteria counts are transformed to log values prior to
+calculation of the difference. Microbiology parameters are acceptable when the absolute difference of the log values is less than 0.6.")}
 ```
