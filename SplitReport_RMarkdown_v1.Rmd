@@ -1,0 +1,476 @@
+---
+params:
+  data: NA
+  deq: NA
+  split: NA
+  org: NA
+  perm: NA
+  rep: NA
+  comp: NA
+  conc: NA
+
+encoding: utf-8
+output:
+  pdf_document
+header-includes: 
+  \PassOptionsToPackage{dvipsnames,table}{xcolor}
+  \usepackage{colortbl}
+  \usepackage{booktabs}
+  \usepackage{float}
+  \usepackage{longtable}
+  \usepackage{array}
+  \usepackage{multirow}
+  \let\oldrule=\rule
+  \renewcommand{\rule}[1]{\oldrule{\linewidth}}
+
+---
+```{r setup-packages-functions, include=FALSE}
+library(knitr)
+library(tidyverse)
+#library(ragtop) #for is.blank function
+
+
+
+#including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
+#included packages in YAML header to fix problem
+options(kableExtra.latex.load_packages=FALSE)
+library(kableExtra)
+library(tinytex)
+
+#these are local files
+source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
+source("C:/Users/dbrown/Split_Code/QC_Issue.R")
+logo <- "C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
+```
+
+```{r echo=FALSE}
+#get organization name, lab used, sample dates
+spltorg<-params$org
+spltorgnm<-unique(spltorg$org_name)
+spltlabnm<-unique(spltorg$Analytical_Lab)
+  
+dates<-sort(unique(spltorg$SampleStartDate))
+#reformat date
+dates<-format(dates,format="%m-%d-%Y")
+
+#DEQ sampling event number (the first 7 digits of the activity id)
+deqorg<-params$deq
+wrkrdr<-unique(substr(deqorg$act_id,1,7))
+```
+
+
+```{r logo, echo=FALSE,message=FALSE, warning=FALSE,fig.align='left', out.width="400px",out.height="200px"}
+
+#logo defined at the top
+knitr::include_graphics(logo)
+#
+```
+
+# Memorandum 
+
+## `r paste("To: ",params$rep)`
+## From: Carter Thomas 
+
+# `r paste("Analytical Split Report For", spltorgnm,", Permit # ",params$perm)`
+# `r paste("Report Date:", Sys.Date())`
+# `r paste("DEQ Sampling Event: ", wrkrdr)`
+## Date(s): `r paste(dates)`
+***
+
+This report compares the analytical results between Oregon DEQ and `r spltlabnm` for `r spltorgnm` performed on the dates and locations outlined in Table 1. 
+
+
+```{r echo=FALSE, results='asis'}
+
+options(knitr.kable.NA='')
+# need table of sampling locations,dates,times, and what was analyzed (this last bit might be harder to do-have to group chars, can leave off for now)
+deqdat<-params$split
+
+meta<-unique(subset(deqdat,select=c(MLocID,StationDes.deq,SampleStartDate,SampleStartTime.deq))) %>%
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
+
+kable(meta,format='latex',caption="Split Sample Information",booktabs=TRUE,row.names=FALSE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped"))
+```
+# Review of Laboratory QA/QC Data
+
+``` {r echo=FALSE, results='asis'}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {cat(spltorgnm, "Supplied level II (Results and data QA/QC) reports from",paste(as.character(spltlabnm),collapse="/"),
+" which have been reviewed carefully for completeness, precision and accuracy. The quality control
+elements (when present) were evaluated with a minimum requirement of a Method Blank and Laboratory
+Control Sample for most analysis.
+
+Method Blank (MB): Analyte concentrations in blank samples should fall below the laboratory's reporting
+limit or be less than 10% of the lowest reported concentration in the sample batch.
+
+Laboratory Control Sample (LCS): A laboratory control sample (LCS) consisting of a controlled/known
+concentration should be analyzed and pass the appropriate QC limits for all analytes. These samples are used to
+assess the overall method performance and are the primary indicator of laboratory performance.
+
+Matrix Spike (MS): A Matrix Spike should be completed with each sample batch to indicate the presence of
+possible interferences. The MS results are examined to evaluate the impact of matrix effects on the
+environmental sample that was spiked.
+
+Duplicates (DUP): Laboratory replicates should be analyzed with each analytical batch and fall within the
+laboratory's QC limits. Analytical duplicates would be evaluated for consistency/comparability in analytical
+results. A Laboratory Control Sample Duplicate (LCSD) or Matrix Spike Duplicate (MSD) may be used to meet
+this criterion.")}
+
+if(unique(spltorg$Project1)=="Effluent Monitoring"|unique(spltorg$Project1=="Landfill Monitoring")) {cat("
+
+*__Comparison Criteria__*
+
+The Split Sample Quality Assurance report compares laboratory measurements using different analytical methods and/or laboratories.
+The laboratory measurements are compared by one of two methods based on the samples' concentrations relative to the laboratory
+Method Reporting Limit (MRL) for that analyte.
+
+Difference: When one or both of the duplicates are less than five times the MRL, the values are compared by difference. The results are
+acceptable when the difference between the samples is less than twice the MRL. In the event that the split lab reports to the MDL, differences for reported values that fall between the MDL and the MRL (aka 'J flag' results) will be shown for informational purposes only.
+
+RPD: When both of the duplicate samples are greater than or equal to five times the MRL, the values are compared using the relative
+percent difference between the samples. The RPD is determined as the difference between the samples divided by the average of the
+values. Acceptable field duplicates have an absolute RPD of 30% or less.
+
+Microbiology parameters are always compared by difference. However, the bacteria counts are transformed to log values prior to
+calculation of the difference. Microbiology parameters are acceptable when the absolute difference of the log values is less than 0.6.")}
+```
+
+# Summary
+
+## *Comparison Limit Tables* 
+The following tables are quality assurance summaries grouped by analyte type. These tables only contain data where the quality assurance was outside of acceptable criteria limits. Note: For non-detects when method detection limit was provided to DEQ in the electronic data delivery form, calculations in this summary table may appear inaccurate. See Full Split Sample Report tables for method reporting limits.
+
+
+```{r echo=FALSE, results='asis', warning=FALSE}
+#create summary tables of what is out of QC 
+
+#need full split report
+spltcomp<-params$split
+
+#add issue column 
+spltcomp<-qc_issue(spltcomp)
+
+#add j flag to data below MRL for split data reported to MDL
+spltcomp$Result_Text.split<-ifelse(
+  substr(spltcomp$Result_Text.split,start=1,stop=1) !="<" & (
+    (!is.na(spltcomp$MRLValue.split) & as.numeric(spltcomp$Result_Text.split) <= spltcomp$MRLValue.split) |
+    (is.na(spltcomp$MRLValue.split) & as.numeric(spltcomp$Result_Text.split) <= spltcomp$MRLValue.deq)
+    ), 
+  paste0(spltcomp$Result_Text.split," J"),
+  spltcomp$Result_Text.split)
+
+#make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
+
+if(unique(spltorg$Project1)=="Effluent Monitoring") {
+  iss<-subset(spltcomp,issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+  
+   #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" (need to do after param_grp function for names' sake)
+iss<-iss%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
+
+ if(nrow(iss)>0)
+   {kable(iss,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Analytes outside of acceptable criteria limits",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")} else {cat("**No analytes outside of acceptable criteria limits**")}
+}
+
+#if landfill project, split out tables (need to do separate if statements for each table so that they show up properly)
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+  #add in parameter groupings
+
+  spltcomp<-param_grp(spltcomp)
+  
+  #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" (need to do after param_grp function for names' sake)
+spltcomp<-spltcomp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))}
+
+#create tables based on groups, only include where QC is violated
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+#VOCs
+#take rows where we have QC violations, only return columns we need (station, analyte, results, unit, and RPD/diff)
+voc<-subset(spltcomp,param_grp=="VOCs"& issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+
+#order by analyte
+voc<-voc[order(voc$Char_Name),]
+  
+if(nrow(voc)>0){
+kable(voc,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Volatile Organic Carbon",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")}
+}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+#Semivolatiles
+semivol<-subset(spltcomp,param_grp=="Semivolatiles"& issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+
+semivol<-semivol[order(semivol$Char_Name),]
+
+if(nrow(semivol)>0){
+kable(semivol,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Semivolatile Organic Carbons",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")}
+}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+#Metals 
+metals<-subset(spltcomp,param_grp=="Metals" & issue=="TRUE",select=c(MLocID,Char_Name,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))
+
+metals<-metals[order(metals$Char_Name),]
+
+if(nrow(metals)>0){
+kable(metals,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Metals",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")}
+}
+
+if(unique(spltorg$Project1)=="Landfill Monitoring") {
+#Physical Chemistry
+phys<-subset(spltcomp,param_grp=="Physical Chem"& issue=="TRUE",select=c(MLocID,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,splitRPD,splitDiff))%>%
+  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+phys<-phys[order(phys$Char_Name),]
+
+if(nrow(phys)>0){
+kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Unit","RPD","Diff"), caption="Physical Chemistry",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+  add_header_above(c(" "=2,"Result"=2," "=3))%>%
+  column_spec(2,width="12em")%>%
+  column_spec(3:7,width="5em")}
+}
+
+if(unique(spltorg$Project1=="Landfill Monitoring")){
+if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0) 
+{cat("**No analytes outside of acceptable criteria limits**")}
+}
+
+```
+
+## *Comparison*
+
+`r params$comp`
+
+## *Conclusion*
+
+`r params$conc`
+
+# Full Split Sample Report
+
+```{r echo=FALSE, results='asis'}
+
+
+if(unique(spltorg$Project1)=="Landfill Monitoring")
+{
+#get subset of columns, combine characteristic name and speciation
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% 
+  mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% 
+  
+  
+  #changed to add param_grp
+  mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+#reformat date
+spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+
+
+#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5" and shorten various other names
+spltrp<-spltrp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
+
+#this table is huge and unwieldy, try splitting it down by station/date/time/parameter group
+#need to concatenate a column with MLocID and param_grp together so that it splits down accordingly
+spltrp$stparam<-paste0(spltrp$MLocID,spltrp$param_grp)
+lstsplt<-split(spltrp,spltrp$stparam)
+
+for (i in 1:length(lstsplt)){
+  #get station, date, and time as variables so we can put them in the table name
+  station<-unique(lstsplt[[i]]$MLocID)
+  date<-unique(lstsplt[[i]]$SampleStartDate)
+  time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+  grp<-unique(lstsplt[[i]]$param_grp)
+  
+  #remove station, date, and time columns
+  lstsplt[[i]]$MLocID<-NULL
+  lstsplt[[i]]$SampleStartDate<-NULL
+  lstsplt[[i]]$SampleStartTime.deq<-NULL
+  lstsplt[[i]]$param_grp<-NULL
+  lstsplt[[i]]$stparam<-NULL
+  
+  #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
+  #so we create MRLNum variable to use and then hide the column later
+  lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
+  lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
+  
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+            caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
+        column_spec(1,width="10em") %>%
+        column_spec(5:6,width="5em") %>%
+            #hide last column, don't want it shown
+        column_spec(11,width="0em",color="white") %>%
+        row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
+        )
+}
+
+}
+
+if(unique(spltorg$Project1)=="Effluent Monitoring")
+{
+#get subset of columns, combine characteristic name and speciation, and remove the speciation column
+spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
+                                 Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+  select(-Char_Speciation.deq)
+
+#make split lab LOQ 'NR' if not reported
+spltrp$MRLValue.split<-ifelse(is.na(spltrp$MRLValue.split),"NR",spltrp$MRLValue.split)
+
+#reformat date
+spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+
+#change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
+spltrp<-spltrp%>%
+  mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+  mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
+
+#this table is huge and unwieldy, try splitting it down by station/date/time
+spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate, spltrp$SampleStartTime.deq)
+lstsplt<-split(spltrp,spltrp$stdttm)
+
+for (i in 1:length(lstsplt)){
+  #get station, date, and time as variables so we can put them in the table name
+  station<-unique(lstsplt[[i]]$MLocID)
+  date<-unique(lstsplt[[i]]$SampleStartDate)
+  time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+  stdttm<-unique(lstsplt[[i]]$stdttm)
+  
+  #remove station, date, and time columns
+  lstsplt[[i]]$MLocID<-NULL
+  lstsplt[[i]]$SampleStartDate<-NULL
+  lstsplt[[i]]$SampleStartTime.deq<-NULL
+  lstsplt[[i]]$stdttm<-NULL
+  
+  #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
+  #so we create MRLNum variable to use and then hide the column later
+  lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
+  lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
+  
+  print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+            caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
+        column_spec(1,width="7em") %>%
+        column_spec(2:3,width="3em")%>%
+        column_spec(5:6,width="7em") %>%
+        column_spec(7:8,width="3em")%>%
+            #hide last column, don't want it shown
+        column_spec(11,width="0em",color="white") %>%
+        row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
+        )
+}
+
+}
+```
+
+# Data Qualifications
+
+The following tables outline data qualifications or comments noted by either the DEQ laboratory or `r spltlabnm`
+
+```{r echo=FALSE, results='asis'}
+#get a table of all the comments (don't use lab comment, is very generic and not helpful- just have activity comment and result comment)
+issues<-subset(spltcomp,!is.na(Activity_Comment.deq)|!is.na(Result_Comment.deq)|!is.na(Activity_Comment.split)
+                          |!is.na(Result_Comment.split)) %>%
+               mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq)))%>%
+               select(-Char_Speciation.deq) %>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+"%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))
+
+#combine all comments into one row for deq and for split lab
+issues$Comment.deq<-paste(ifelse(!is.na(issues$Activity_Comment.deq),issues$Activity_Comment.deq,''),
+                          ifelse(!is.na(issues$Result_Comment.deq),issues$Result_Comment.deq,''))
+issues$Comment.split<-paste(ifelse(!is.na(issues$Activity_Comment.split),issues$Activity_Comment.split,''),
+                            ifelse(!is.na(issues$Result_Comment.split),issues$Result_Comment.split,''))
+
+
+#table for DEQ issues, select certain columns (just want station, characteristic, and comment column)
+#remove comment ">::B >2419;"- this occurs when the microbial test has maxed out its count, and is confusing to non-DEQ folks
+deqissues<-subset(issues,(!is.na(Activity_Comment.deq)
+                          |!is.na(Result_Comment.deq))& !(Result_Comment.deq %in% ">::B >2419;"),
+                  select=c(MLocID,Char_Name,Comment.deq))
+#table for split data issues, select certain columns
+spltissues<-subset(issues,!is.na(Activity_Comment.split)|!is.na(Result_Comment.split),
+                   select=c(MLocID,Char_Name,Comment.split))
+
+names(deqissues)<-c("Station","Analyte","DEQ Data Lab Comments")
+names(spltissues)<-c("Station","Analyte","Split Data Lab Comments")
+
+#can be big table, still needs work. Maybe split into two (deq vs split lab) or by site?
+if(nrow(deqissues)>0){
+kable(deqissues,format='latex',caption="DEQ Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+        column_spec(1,width="8em")%>%
+        column_spec(2,width="12em")%>%
+        column_spec(3,width="30em")
+   } else cat("**No DEQ data quality issues**")     
+
+#create new code chunk for the split data table, otherwise if there are no issues with both DEQ or split data the two returned lines end up being smashed into one line of text without spaces-doesn't look pretty
+```
+
+```{r echo=FALSE, results='asis'}
+if(nrow(spltissues)>0){
+kable(spltissues,format='latex',caption="Split Data Qualifications",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+        column_spec(1,width="8em")%>%
+        column_spec(2,width="12em")%>%
+        column_spec(3,width="30em")
+} else cat("**No split data quality issues**")  
+```
+
+# Subcontracted Analytes
+
+The following table outlines any analytes that were subcontracted to other labs by DEQ
+
+```{r echo=FALSE, results='asis'}
+sublab<-params$deq
+
+sublab<-namefrac(sublab)
+sublab<-subset(sublab,sublab$Analytical_Lab!="DEQ Laboratory and Environmental Assessment Div.",select=c("MLocID","Char_Name","Result_Text","Result_Unit","Method_Code","Analytical_Lab"))
+
+names(sublab)<-c("Station","Analyte","Result","Unit","Method","Subcontract Lab")
+
+if(nrow(sublab)>0){
+kable(sublab,format='latex',caption="Subcontracted Analytes",booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+  kable_styling(latex_options=c("HOLD_position","striped","repeat_header"))
+} else cat("**No subcontracted analytes**")
+```
