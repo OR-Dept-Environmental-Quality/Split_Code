@@ -147,9 +147,15 @@ ui<-fluidPage(
       rendd<-toString(sprintf("%s",input$endd))
       
       #actual query for data
-      dat<-AWQMS_Data(startdate=rstdt,enddate=rendd,OrganizationID = c(input$orgs,"OREGONDEQ"),
-                      project=c(input$project),MLocID = c(input$monlocs), filterQC = FALSE) %>%
-        filter(MLocID != '10000-ORDEQ')
+      dat1<-AWQMS_Data(startdate=rstdt,enddate=rendd,OrganizationID = c(input$orgs,"OREGONDEQ"),
+                      project=c(input$project),MLocID = c(input$monlocs), filterQC = FALSE) 
+      
+      dat <- dat1 %>%
+        filter(MLocID != '10000-ORDEQ') %>%
+        mutate(MLocID = case_when(
+          str_detect(Activity_Type, "Quality Control") ~ paste0(MLocID, "-Dup"),
+          TRUE ~ MLocID
+        ))
       
       dat
       
