@@ -38,9 +38,9 @@ library(kableExtra)
 library(tinytex)
 
 #these are local files
-source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
-source("C:/Users/dbrown/Split_Code/QC_Issue.R")
-logo <- "C:/Users/dbrown/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
+source("ParamGrp_Function.R")
+source("/QC_Issue.R")
+logo <- "/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
 ```{r Gather Information, echo=FALSE}

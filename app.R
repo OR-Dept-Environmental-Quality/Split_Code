@@ -3,6 +3,19 @@
 #put all data into AWQMS, pull data from AWQMS and the compare in R
 #use a Shiny app to pull out data, view comparison, then use R Markdown to create a report
 
+
+#Carter's Troubleshooting Guide
+
+#Problem:
+#Solution:
+
+#Problem: Tried to generate PDF report, but it said "Quitting from SplitReport_Rmarkdown.Rmd: 27-44 [setup-package-functions]"
+#Solution: R can't find the three local files (ParamGrp_Function.R, QC_Issue.R, and the logo). Is the file path correct? Check the first chunk (lines 27-44)
+
+#Problem: Tried to generate PDF report, but it said '"pdflatex'" not found
+#Solution: Probably don't have LaTeX installed, go here https://yihui.org/tinytex/ and find "install-bin-windows.bat"
+
+
 #To capture any updates to the AWQMSdata package, run this line periodically
 #devtools::install_github("TravisPritchardODEQ/AWQMSdata",dependencies = TRUE, force = TRUE, upgrade = FALSE)
 
@@ -15,6 +28,7 @@ library(shinybusy)
 library(openxlsx)
 library(dplyr)
 library(DT)
+library(stringr)
 source("Split_Comp_Function.R")
 source("ParamGrp_Function.R")
 source("NameandFraction.R")
