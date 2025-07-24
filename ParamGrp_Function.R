@@ -9,7 +9,8 @@ param_grp<-function(x){
   #groupings
   
   #need to add all total and dissolved cases to metals that result from namefrac, or else they won't show up
-  metals<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)","Aluminum","Iron","Lead","Mercury","Nickel","Silver","Thallium","Antimony","Arsenic","Arsenic, Inorganic",
+  #DTB moved two cyanide parameters to Physical group 072425
+  metals<-c("Aluminum","Iron","Lead","Mercury","Nickel","Silver","Thallium","Antimony","Arsenic","Arsenic, Inorganic",
             "Beryllium","Cadmium","Chromium","Copper","Zinc","Selenium","Chromium(III)","Chromium(VI)","Arsenic ion (3+)","Calcium","Cobalt",
             "Lithium","Beryllium","Manganese","Magnesium","Molybdenum","Potassium","Sodium","Uranium","Vanadium","Barium","Boron",
             "Aluminum, Dissolved","Aluminum, Total Recoverable","Antimony, Dissolved", "Arsenic, Dissolved","Barium, Dissolved",
@@ -40,7 +41,7 @@ param_grp<-function(x){
          "sec-Butylbenzene","Styrene","Toluene","Trichloroethene (TCE)", "o-Xylene, mixt. with m-xylene and p-xylene","Xylene","m,p-Xylene",
          "Tetrachloroethylene","Trichloroethylene")
   
-  #semivolatiles
+  #semivolatiles #DTB removed Naphthalene 072425, it is still in the VOC group
   semiv<-c("1,2,4,5-Tetrachlorobenzene", "1,2,4-Trichlorobenzene", "1-Methylphenanthrene", "1-Methylpyrene", "2,3,4,6-Tetrachlorophenol", 
            "2,3,5,6-Tetrachlorophenol", "2,4,5-Trichlorophenol", "2,4,6-Trichlorophenol", "2,4-Dichlorophenol", "2,4-Dimethylphenol", 
            "2,4-Dinitrophenol", "2,4-Dinitrotoluene", "2,6-Dichlorophenol", "2,6-Dinitrotoluene", "2-Chloronaphthalene", 
@@ -49,13 +50,13 @@ param_grp<-function(x){
            "Bis(2-chloroethyl) ether", "Bis(2-chloroisopropyl) ether", "Butyl benzyl phthalate", "Chrysene", "Di(2-ethylhexyl) adipate", 
            "Di(2-ethylhexyl) phthalate", "Dibenz[a,h]anthracene", "Dibenzofuran", "Dibutyl phthalate", "Diethyl phthalate", "Dimethyl phthalate",
            "Di-n-octyl phthalate", "Fluoranthene", "Fluorene", "Hexachlorobenzene",  "Hexachlorobutadiene", "Hexachlorocyclopentadiene", 
-           "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", "Naphthalene",'o-Chlorophenol' ,"o-Cresol",
+           "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", 'o-Chlorophenol' ,"o-Cresol",
            "o-Nitrophenol" ,'4,6-Dinitro-o-cresol' , 'BDE-003' ,'p-Chloro-m-cresol','p-Chlorophenyl phenyl ether','p-Nitrophenol' ,
            'Bis(2-chloro-1-methylethyl) ether','Nitrobenzene' ,'N-Nitrosodi-n-propylamine','N-Nitrosodiphenylamine',
-           'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene')
+           'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene', 'Nitrosodimethylamine', 'Pentachlorobenzene')
   
   #physical chemistry parameters (a little bit of a grab bag)
-  phys<-c("Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
+  phys<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)", 'Cyanide, Total N-',"Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
           "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
           "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
