@@ -236,6 +236,7 @@ if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0)
 `r params$comp`
 
 # Full Split Sample Report
+Data submitted to DEQ is reported down to the MDL. For this comparison table, however, non-detects reflect the MRL values for both DEQ and the Split Lab.
 
 ```{r Full Sample Report Table Setup, echo=FALSE, results='asis'}
 
