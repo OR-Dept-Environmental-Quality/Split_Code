@@ -53,10 +53,10 @@ param_grp<-function(x){
            "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", 'o-Chlorophenol' ,"o-Cresol",
            "o-Nitrophenol" ,'4,6-Dinitro-o-cresol' , 'BDE-003' ,'p-Chloro-m-cresol','p-Chlorophenyl phenyl ether','p-Nitrophenol' ,
            'Bis(2-chloro-1-methylethyl) ether','Nitrobenzene' ,'N-Nitrosodi-n-propylamine','N-Nitrosodiphenylamine',
-           'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene', 'Nitrosodimethylamine', 'Pentachlorobenzene')
+           'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene', 'N-Nitrosodimethylamine', 'Pentachlorobenzene')
   
   #physical chemistry parameters (a little bit of a grab bag)
-  phys<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)", 'Cyanide, Total N-',"Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
+  phys<-c("Cyanide","Cyanides amenable to chlorination (HCN & CN)", 'Cyanide, Total',"Conductivity",	"Depth, bottom","Depth, from ground surface to well water level","Dissolved oxygen (DO)",
           "Oxidation reduction potential (ORP)", "pH","Temperature, water","Nitrate + Nitrite","Ammonium","Organic carbon, Total", 
           "Organic carbon, Dissolved","Chemical oxygen demand","Alkalinity, total","Ammonia","Total dissolved solids","Total suspended solids",
           "Total hardness","Hardness, Ca, Mg","Sulfate","Chloride","Silica", "Silica, Dissolved","Silica, Total Recoverable", 
