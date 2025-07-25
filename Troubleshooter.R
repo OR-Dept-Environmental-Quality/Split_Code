@@ -6,10 +6,10 @@ library(tinytex)
 library(htmltools)
 
 # Load functions
-source("C:/Users/dbrown/Split_Code/ParamGrp_Function.R")
-source("C:/Users/dbrown/Split_Code/QC_Issue.R")
-source("C:/Users/dbrown/Split_Code/Split_Comp_Function.R")
-source("C:/Users/dbrown/Split_Code/NameandFraction.R")
+source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/ParamGrp_Function.R")
+source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/QC_Issue.R")
+source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/Split_Comp_Function.R")
+source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/NameandFraction.R")
 source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/heads/master/R/Unit_Convert.R")
 
 
