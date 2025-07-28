@@ -119,7 +119,14 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
                          "qctype","splitRPD","splitDiff"
                          ))
   
-  
+  #filter out rows were 8260 and 8270 are compared
+  jn<-jn %>%
+    filter(
+      case_when(
+        str_starts(Method_Code.deq, "8260") & !str_starts(Method_Code.split, "8260") ~ FALSE,
+        str_starts(Method_Code.deq, "8270") & !str_starts(Method_Code.split, "8270") ~ FALSE,
+        TRUE ~ TRUE)
+    )  
   
     
   return(jn)
