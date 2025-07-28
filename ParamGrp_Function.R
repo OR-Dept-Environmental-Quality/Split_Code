@@ -41,7 +41,7 @@ param_grp<-function(x){
          "sec-Butylbenzene","Styrene","Toluene","Trichloroethene (TCE)", "o-Xylene, mixt. with m-xylene and p-xylene","Xylene","m,p-Xylene",
          "Tetrachloroethylene","Trichloroethylene")
   
-  #semivolatiles #DTB removed Naphthalene 072425, it is still in the VOC group
+  #semivolatiles 
   semiv<-c("1,2,4,5-Tetrachlorobenzene", "1,2,4-Trichlorobenzene", "1-Methylphenanthrene", "1-Methylpyrene", "2,3,4,6-Tetrachlorophenol", 
            "2,3,5,6-Tetrachlorophenol", "2,4,5-Trichlorophenol", "2,4,6-Trichlorophenol", "2,4-Dichlorophenol", "2,4-Dimethylphenol", 
            "2,4-Dinitrophenol", "2,4-Dinitrotoluene", "2,6-Dichlorophenol", "2,6-Dinitrotoluene", "2-Chloronaphthalene", 
@@ -52,7 +52,7 @@ param_grp<-function(x){
            "Di-n-octyl phthalate", "Fluoranthene", "Fluorene", "Hexachlorobenzene",  "Hexachlorobutadiene", "Hexachlorocyclopentadiene", 
            "Hexachloroethane", "Indeno[1,2,3-cd]pyrene", "Isophorone", "m-Dichlorobenzene", 'o-Chlorophenol' ,"o-Cresol",
            "o-Nitrophenol" ,'4,6-Dinitro-o-cresol' , 'BDE-003' ,'p-Chloro-m-cresol','p-Chlorophenyl phenyl ether','p-Nitrophenol' ,
-           'Bis(2-chloro-1-methylethyl) ether','Nitrobenzene' ,'N-Nitrosodi-n-propylamine','N-Nitrosodiphenylamine',
+           'Bis(2-chloro-1-methylethyl) ether','Naphthalene','Nitrobenzene' ,'N-Nitrosodi-n-propylamine','N-Nitrosodiphenylamine',
            'Pentachlorophenol' ,'Phenanthrene' ,'Phenol' ,'Pyrene', 'N-Nitrosodimethylamine', 'Pentachlorobenzene')
   
   #physical chemistry parameters (a little bit of a grab bag)
