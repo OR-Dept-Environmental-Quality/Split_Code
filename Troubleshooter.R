@@ -17,7 +17,7 @@ source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/hea
 StDate <- '2022-09-20'
 EndDate <- '2022-09-20'
 Project <- 'Landfill Monitoring'
-SplOrg <- 'WEYCO_NOBEND_LF(NOSTORETID)'
+SplOrg <- 'LF_WEYCONOBEND'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(SplOrg, 'OREGONDEQ'),
@@ -29,7 +29,10 @@ dat <- All_Data %>%
   mutate(MLocID = case_when(
     str_detect(Activity_Type, "Quality Control") ~ paste0(MLocID, "_Dup"),
     TRUE ~ MLocID
-  ))
+  )) %>%
+  relocate(c(MRLValue,MDLValue), .after = Result_Unit) %>% 
+  mutate(as.numeric(MRLValue), as.numeric(MDLValue))
+  
 
 # Create tables of DEQ and Split data (effectively lines 169-175 and 184-189 in app.R)
 deq <- subset(dat, OrganizationID=='OREGONDEQ') %>%
@@ -98,7 +101,8 @@ splt<-namefrac(splt)
 if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=str_replace(Char_Name,"Nitrate","Nitrate + Nitrite"))}
 
 #need to join datasets on an inner join
-jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split")) %>%
+  relocate(c(MDLValue.deq, MRLValue.deq, Result_Numeric.split, MDLValue.split, MRLValue.split), .after = Result_Unit.deq)
 
 
 
@@ -165,6 +169,20 @@ jn<-subset(jn,select=c("MLocID","Activity_Type","SampleStartDate","SampleStartTi
                        "MRLType.deq","MRLValue.deq","MRLUnit.deq","MRLType.split","MRLValue.split","MRLUnit.split",
                        "qctype","splitRPD","splitDiff"
 ))
+
+#filter out rows were 8260 and 8270 are compared
+jn<-jn %>%
+  filter(
+    case_when(
+      str_starts(Method_Code.deq, "8260") & !str_starts(Method_Code.split, "8260") ~ FALSE,
+      str_starts(Method_Code.deq, "8270") & !str_starts(Method_Code.split, "8270") ~ FALSE,
+      TRUE ~ TRUE)
+    )
+
+unique_combos <- filterjn %>% 
+  distinct(Char_Name,Method_Code.deq,Method_Code.split)
+
+n_unique <- nrow(unique_combos)
 
 # Change dataframe name to match SplitReport_RMarkdown.Rmd
 spltcomp <- jn
