@@ -8,7 +8,7 @@ splitcomp<-function(deq,splt)
   require(dplyr)
   require(stringr)
   source("NameandFraction.R")
-  source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/heads/master/R/Unit_Convert.R") # conversions in lines 36-39 weren't working without this DTB 1/6/25
+  source("Unit_Convert_Function.R")
   
 #####UNITS
 #convert units so they match DEQ's data (NOTE: THIS NEEDS MORE TESTING TO MAKE SURE THE CODE WORKS PROPERLY)
