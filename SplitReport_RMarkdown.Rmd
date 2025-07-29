@@ -281,6 +281,18 @@ for (i in 1:length(lstsplt)){
   time<-unique(lstsplt[[i]]$SampleStartTime.deq)
   grp<-unique(lstsplt[[i]]$param_grp)
   
+  if (grp == "Semivolatiles") {
+    lstsplt[[i]] <- lstsplt[[i]] %>%
+      dplyr::filter(!str_starts(Method_Code.deq, "8260") &
+                    !str_starts(Method_Code.split, "8260"))
+  }
+  
+  if (grp == "VOCs") {
+    lstsplt[[i]] <- lstsplt[[i]] %>%
+      dplyr::filter(!str_starts(Method_Code.deq, "8270") &
+                    !str_starts(Method_Code.split, "8270"))
+  }
+  
   #remove station, date, and time columns
   lstsplt[[i]]$MLocID<-NULL
   lstsplt[[i]]$SampleStartDate<-NULL
