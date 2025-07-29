@@ -10,7 +10,7 @@ source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/ParamGrp_Function
 source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/QC_Issue.R")
 source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/Split_Comp_Function.R")
 source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/NameandFraction.R")
-source("https://raw.githubusercontent.com/TravisPritchardODEQ/AWQMSdata/refs/heads/master/R/Unit_Convert.R")
+source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/Unit_Convert_Function.R")
 
 
 # Enter parameters for data pull
@@ -29,9 +29,7 @@ dat <- All_Data %>%
   mutate(MLocID = case_when(
     str_detect(Activity_Type, "Quality Control") ~ paste0(MLocID, "_Dup"),
     TRUE ~ MLocID
-  )) %>%
-  relocate(c(MRLValue,MDLValue), .after = Result_Unit) %>% 
-  mutate(as.numeric(MRLValue), as.numeric(MDLValue))
+  ))
   
 
 # Create tables of DEQ and Split data (effectively lines 169-175 and 184-189 in app.R)
@@ -83,10 +81,10 @@ ugng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_
 #if there are any rows in mgug or ugmg then run data through unit conversion function
 #add ngug and ugng
 
-if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,"mg/l","ug/l")}
-if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")}
-if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,"ng/l","ug/l")} # changed column to ngug$Char_Name from ugmg$Char_Name - DTB 112024
-if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,"ug/l","ng/l")} # changed column to ugng$Char_Name from ugmg$Char_Name - DTB 112024
+if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,mgug$Result_Unit.splt,mgug$Result_Unit.deq)} # changed the last two variables
+if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,ugmg$Result_Unit.splt,ugmg$Result_Unit.deq)} # from the text versions of the units
+if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,ngug$Result_Unit.splt,ngug$Result_Unit.deq)} # to be changed to the column in the
+if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,ugng$Result_Unit.splt,ugng$Result_Unit.deq)} # dataset that should be referenced
 
 ###JOIN DEQ AND SPLIT DATA
 #use namfrac function to get fraction as part of name for Metals 
