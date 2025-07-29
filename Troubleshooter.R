@@ -6,11 +6,11 @@ library(tinytex)
 library(htmltools)
 
 # Load functions
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/ParamGrp_Function.R")
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/QC_Issue.R")
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/Split_Comp_Function.R")
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/NameandFraction.R")
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/Unit_Convert_Function.R")
+source("ParamGrp_Function.R")
+source("QC_Issue.R")
+source("Split_Comp_Function.R")
+source("NameandFraction.R")
+source("Unit_Convert_Function.R")
 
 
 # Enter parameters for data pull
