@@ -33,6 +33,7 @@ library(tidyverse)
 #here<-here()
 #setwd(here)
 
+fafasf
 
 #including kableExtra seems to mess with booktabs and float latex packages, so compile fails on second pdf. 
 #included packages in YAML header to fix problem
@@ -44,9 +45,9 @@ library(tinytex)
 #source("ParamGrp_Function.R")
 #source("QC_Issue.R")
 #logo <- "DEQ-logo-color-notransp-horiz750x156.png"
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/ParamGrp_Function.R")
-source("C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/QC_Issue.R")
-logo <- "C:/Users/dbrown/OneDrive - Oregon/Documents/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
+source("C:/Users/cthomas/Documents_local/local_R_resources/Split_Code/ParamGrp_Function.R")
+source("C:/Users/cthomas/Documents_local/local_R_resources/Split_Code/QC_Issue.R")
+logo <- "C:/Users/cthomas/Documents_local/local_R_resources/Split_Code/DEQ-logo-color-notransp-horiz750x156.png"
 ```
 
 ```{r Gather Information, echo=FALSE}
