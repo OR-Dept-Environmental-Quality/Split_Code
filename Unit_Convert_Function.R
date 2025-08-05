@@ -27,7 +27,7 @@ unit_conv<-function(x,char,unit,conv){
 
   #convert Result_Numeric
   x$Result_Numeric<-dplyr::case_when(x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="deg f" & tolower(conv)=="deg c"~((x$Result_Numeric-32)*0.5556),
-                              x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$Result_Numeric*0.001),
+                              x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$Result_Numeric/1000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~(x$Result_Numeric*1000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~(x$Result_Numeric/1000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="ng/l"~(x$Result_Numeric*1000),
