@@ -142,7 +142,7 @@ iss<-iss%>%
   kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
   add_header_above(c(" "=2,"Result"=2," "=3))%>%
   column_spec(2,width="12em")%>%
-  column_spec(3:7,width="5em")} else {cat("**No analytes outside of acceptable criteria limits**")}
+  column_spec(3:7,width="5em")} else {cat("**No analytes outside of acceptable criteria limits.**")}
 }
 
 #if landfill project, split out tables (need to do separate if statements for each table so that they show up properly)
@@ -226,7 +226,7 @@ kable(phys,format='latex',col.names=c("Location","Analyte","DEQ","Split Lab","Un
 
 if(unique(spltorg$Project1=="Landfill Monitoring")){
 if(nrow(phys)==0 & nrow(metals)==0 & nrow(semivol)==0 & nrow(voc)==0) 
-{cat("**No analytes outside of acceptable criteria limits**")}
+{cat("**No analytes outside of acceptable criteria limits.**")}
 }
 
 ```
