@@ -106,7 +106,7 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
   jn$timediff.deq<-as.difftime(jn$SampleStartTime.deq,units="mins")
   jn$timediff.split<-as.difftime(jn$SampleStartTime.split,units="mins")
   jn$timediff<-abs(jn$timediff.deq-jn$timediff.split)
-  jn<-subset(jn, jn$timediff<=30)
+  jn<-subset(jn, jn$timediff<=60)
   
   #need to return table of important columns
   #won't include lab comments- they are generic language set by AWQMS and not very helpful
