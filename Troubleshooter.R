@@ -14,10 +14,10 @@ source("Unit_Convert_Function.R")
 
 
 # Enter parameters for data pull
-StDate <- '2022-09-20'
-EndDate <- '2022-09-20'
+StDate <- '2022-11-14'
+EndDate <- '2022-11-16'
 Project <- 'Landfill Monitoring'
-SplOrg <- 'LF_WEYCONOBEND'
+SplOrg <- 'LF_STJOHNS'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(SplOrg, 'OREGONDEQ'),
@@ -177,7 +177,7 @@ jn<-jn %>%
       TRUE ~ TRUE)
     )
 
-unique_combos <- filterjn %>% 
+unique_combos <- jn %>% 
   distinct(Char_Name,Method_Code.deq,Method_Code.split)
 
 n_unique <- nrow(unique_combos)
@@ -255,7 +255,7 @@ spltcomp<-param_grp(spltcomp)
       extra_text <- ""
     }
     
-    print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+    print(kable(lstsplt[[i]],format='html', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
                 caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
             kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
             add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2))%>%
