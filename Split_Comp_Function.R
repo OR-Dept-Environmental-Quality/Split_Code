@@ -51,7 +51,7 @@ splt<-namefrac(splt)
 if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=str_replace(Char_Name,"Nitrate","Nitrate + Nitrite"))}
 
   #need to join datasets on an inner join
-  jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+  jn<-left_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
   
 
 
