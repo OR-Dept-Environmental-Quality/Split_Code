@@ -51,6 +51,10 @@ splt<-namefrac(splt)
 if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=str_replace(Char_Name,"Nitrate","Nitrate + Nitrite"))}
 
   #need to join datasets on an inner join
+  #jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
+  
+  #In circumstances where one org collects a sample when the other doesn't, this line of code allows tables to be combined even when 
+  #the stations don't line up. This means the unmatched stations will end up in the Non-Matched Data tab.
   jn<-left_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
   
 
