@@ -29,14 +29,18 @@ mgug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_
 ugmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
 ngug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
 ugng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
+mgng<-subset(unjn, tolower(unju$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
+ngmg<-subset(unjn, tolower(unju$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
 
 #if there are any rows in mgug or ugmg then run data through unit conversion function
-#add ngug and ugng
+#add ngug, ugng, mgng, and ngmg
 
 if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,mgug$Result_Unit.splt,mgug$Result_Unit.deq)} # changed the last two variables
 if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,ugmg$Result_Unit.splt,ugmg$Result_Unit.deq)} # from the text versions of the units
 if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,ngug$Result_Unit.splt,ngug$Result_Unit.deq)} # to be changed to the column in the
 if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,ugng$Result_Unit.splt,ugng$Result_Unit.deq)} # dataset that should be referenced - DTB 072925
+if (nrow(mgng)!=0) {splt<-unit_conv(splt,mgng$Char_Name,mgng$Result_Unit.splt,mgng$Result_Unit.deq)} # these last two rows of conversion added 101325
+if (nrow(ngmg)!=0) {splt<-unit_conv(splt,ngmg$Char_Name,ngmg$Result_Unit.splt,ngmg$Result_Unit.deq)}
 
 ###JOIN DEQ AND SPLIT DATA
 #use namfrac function to get fraction as part of name for Metals 
