@@ -27,6 +27,8 @@ unit_conv<-function(x,char,unit,conv){
 
   #convert Result_Numeric
   x$Result_Numeric<-dplyr::case_when(x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="deg f" & tolower(conv)=="deg c"~((x$Result_Numeric-32)*0.5556),
+                              x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~(x$Result_Numeric/1000000),
+                              x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~(x$Result_Numeric*1000000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$Result_Numeric/1000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~(x$Result_Numeric*1000),
                               x$Char_Name %in% char & tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~(x$Result_Numeric/1000),
@@ -35,6 +37,8 @@ unit_conv<-function(x,char,unit,conv){
 
   #change unit to new unit
   x$Result_Unit<-dplyr::case_when(x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="deg f" & tolower(conv)=="deg c"~"deg C",
+                           x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~"ng/l",
+                           x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~"mg/l",
                            x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~"mg/l",
                            x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~"ug/l",
                            x$Char_Name %in% char &  tolower(x$Result_Unit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~"ug/l",
@@ -43,13 +47,17 @@ unit_conv<-function(x,char,unit,conv){
 
    #change MDL and MRL values and units
   x$MDLValue<-dplyr::case_when(x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="deg f" & tolower(conv)=="deg c"~((x$MDLValue-32)*0.5556),
-                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$MDLValue*0.001),
+                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~(x$MDLValue/1000000),
+                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~(x$MDLValue*1000000),
+                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$MDLValue/1000),
                         x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~(x$MDLValue*1000),
                         x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~(x$MDLValue/1000),
                         x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="ng/l"~(x$MDLValue*1000),
                         !(x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit))~x$MDLValue)
 
   x$MDLUnit<-dplyr::case_when(x$Char_Name %in% char& tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="deg f"& tolower(conv)=="deg c"~"deg C",
+                       x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~"ng/l",
+                       x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~"mg/l",
                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~"mg/l",
                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~"ug/l",
                        x$Char_Name %in% char & tolower(x$MDLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~"ug/l",
@@ -57,15 +65,19 @@ unit_conv<-function(x,char,unit,conv){
                        !(x$Char_Name %in% char&tolower(x$MDLUnit)==tolower(unit))~x$MDLUnit)
 
   x$MRLValue<-dplyr::case_when(x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="deg f"& tolower(conv)=="deg c"~((x$MRLValue-32)*0.5556),
-                        x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$MRLValue*0.001),
+                        x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~(x$MRLValue/1000000),
+                        x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~(x$MRLValue*1000000),
+                        x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~(x$MRLValue/1000),
                         x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~(x$MRLValue*1000),
                         x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~(x$MRLValue/1000),
                         x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="ng/l"~(x$MRLValue*1000),
                         !(x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit))~x$MRLValue)
 
   x$MRLUnit<-dplyr::case_when(x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="deg f"& tolower(conv)=="deg c"~"deg C",
-                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l"& tolower(conv)=="mg/l"~"mg/l",
-                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="mg/l"& tolower(conv)=="ug/l"~"ug/l",
+                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ng/l"~"ng/l",
+                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="mg/l"~"mg/l",
+                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="mg/l"~"mg/l",
+                              x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="mg/l" & tolower(conv)=="ug/l"~"ug/l",
                               x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ng/l" & tolower(conv)=="ug/l"~"ug/l",
                               x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit) & tolower(unit)=="ug/l" & tolower(conv)=="ng/l"~"ng/l",
                               !(x$Char_Name %in% char & tolower(x$MRLUnit)==tolower(unit))~x$MRLUnit)
