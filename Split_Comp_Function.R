@@ -29,8 +29,8 @@ mgug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_
 ugmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
 ngug<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="ug/l")
 ugng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ug/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
-mgng<-subset(unjn, tolower(unju$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
-ngmg<-subset(unjn, tolower(unju$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
+mgng<-subset(unjn, tolower(unjn$Result_Unit.splt)=="mg/l" & tolower(unjn$Result_Unit.deq)=="ng/l")
+ngmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_Unit.deq)=="mg/l")
 
 #if there are any rows in mgug or ugmg then run data through unit conversion function
 #add ngug, ugng, mgng, and ngmg
