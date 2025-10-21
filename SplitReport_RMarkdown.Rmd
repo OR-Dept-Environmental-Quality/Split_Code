@@ -282,6 +282,8 @@ for (i in 1:length(lstsplt)){
   time<-unique(lstsplt[[i]]$SampleStartTime.deq)
   grp<-unique(lstsplt[[i]]$param_grp)
   
+  if (length(grp) == 0 || all(is.na(grp))) next
+  
   if (grp == "Semivolatiles") {
     lstsplt[[i]] <- lstsplt[[i]] %>%
       dplyr::filter(!str_starts(Method_Code.deq, "8260") &
@@ -311,9 +313,9 @@ for (i in 1:length(lstsplt)){
                           ifelse(grp == "Physical Chem", "***DEQ Nitrate+Nitrite compared to Split Lab Nitrate, when applicable***",
                                  "")),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
         kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3))%>%
         column_spec(1,width="10em") %>%
         column_spec(5:6,width="5em") %>%
-        add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3))%>%
             #hide last column, don't want it shown
         column_spec(11,width="0em",color="white") %>%
         row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
@@ -367,6 +369,7 @@ for (i in 1:length(lstsplt)){
 
   print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
             caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+        kableExtra::as_latex_kable() %>%
         kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
         add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3),
                          escape = FALSE, bold = TRUE) %>%
