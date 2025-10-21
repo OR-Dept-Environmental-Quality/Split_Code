@@ -294,6 +294,7 @@ ui<-fluidPage(
                    conc=input$conc)
       
       rmarkdown::render(tempReport, output_file=file,
+                        output_format = "pdf_document",
                         params=params,
                         clean=TRUE,
                         envir=new.env(parent= globalenv())

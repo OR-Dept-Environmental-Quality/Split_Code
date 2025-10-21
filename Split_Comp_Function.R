@@ -35,12 +35,12 @@ ngmg<-subset(unjn, tolower(unjn$Result_Unit.splt)=="ng/l" & tolower(unjn$Result_
 #if there are any rows in mgug or ugmg then run data through unit conversion function
 #add ngug, ugng, mgng, and ngmg
 
-if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,mgug$Result_Unit.splt,mgug$Result_Unit.deq)} # changed the last two variables
-if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,ugmg$Result_Unit.splt,ugmg$Result_Unit.deq)} # from the text versions of the units
-if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,ngug$Result_Unit.splt,ngug$Result_Unit.deq)} # to be changed to the column in the
-if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,ugng$Result_Unit.splt,ugng$Result_Unit.deq)} # dataset that should be referenced - DTB 072925
-if (nrow(mgng)!=0) {splt<-unit_conv(splt,mgng$Char_Name,mgng$Result_Unit.splt,mgng$Result_Unit.deq)} # these last two rows of conversion added 101325
-if (nrow(ngmg)!=0) {splt<-unit_conv(splt,ngmg$Char_Name,ngmg$Result_Unit.splt,ngmg$Result_Unit.deq)}
+if (nrow(mgug)!=0) {splt<-unit_conv(splt,mgug$Char_Name,"mg/l","ug/l")} # changed the last two variables
+if (nrow(ugmg)!=0) {splt<-unit_conv(splt,ugmg$Char_Name,"ug/l","mg/l")} # from the text versions of the units
+if (nrow(ngug)!=0) {splt<-unit_conv(splt,ngug$Char_Name,"ng/l","ug/l")} # to be changed to the column in the
+if (nrow(ugng)!=0) {splt<-unit_conv(splt,ugng$Char_Name,"ug/l","ng/l")} # dataset that should be referenced - DTB 072925
+if (nrow(mgng)!=0) {splt<-unit_conv(splt,mgng$Char_Name,"mg/l","ng/l")} # these last two rows of conversion added 101325
+if (nrow(ngmg)!=0) {splt<-unit_conv(splt,ngmg$Char_Name,"ng/l","mg/l")}
 
 ###JOIN DEQ AND SPLIT DATA
 #use namfrac function to get fraction as part of name for Metals 
@@ -80,29 +80,50 @@ if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=
     
   #Calculate difference for Diff and Micro don't always get MRL from split lab, use ours to be safe 
   #if micro result is 0, use DEQ MRL since log of 0 is infinity. 
-  jn$splitDiff<- case_when(jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" 
-                           ~abs(jn$Result_Numeric.deq-jn$Result_Numeric.split),
-                           jn$qctype=="Diff" & jn$Result_Operator.deq!="=" & jn$Result_Operator.split=="=" 
-                             ~abs(jn$Result_Numeric.split-jn$MRLValue.deq),
-                           jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split!="=" 
-                             ~abs(jn$Result_Numeric.deq-jn$MRLValue.split), 
-                           jn$qctype=="Micro" & (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & 
-                             (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") &
-                             jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
-                             ~abs(log10(jn$Result_Numeric.deq)-log10(jn$Result_Numeric.split)),
-                           jn$qctype=="Micro"& (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & 
-                             (jn$Result_Operator.split!="="|jn$Result_Operator.split!=">") &
-                             jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
-                             ~abs(log10(jn$Result_Numeric.deq)-log10(jn$MRLValue.deq)),
-                           jn$qctype=="Micro"& (jn$Result_Operator.deq!="="|jn$Result_Operator.deq!=">") & 
-                             (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") &
-                             jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
-                             ~abs(log10(jn$Result_Numeric.split)-log10(jn$MRLValue.deq)),
-                           jn$qctype=="Micro" &  (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") & jn$Result_Numeric.deq==0
-                           ~abs(log10(jn$MRLValue.deq)-log10(jn$Result_Numeric.split)),
-                           jn$qctype=="Micro" & (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & jn$Result_Numeric.split==0
-                           ~abs(log10(jn$MRLValue.deq)-log10(jn$Result_Numeric.deq))
-                           )
+  # jn$splitDiff<- case_when(jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split=="=" 
+  #                          ~abs(jn$Result_Numeric.deq-jn$Result_Numeric.split),
+  #                          jn$qctype=="Diff" & jn$Result_Operator.deq!="=" & jn$Result_Operator.split=="=" 
+  #                            ~abs(jn$Result_Numeric.split-jn$MRLValue.deq),
+  #                          jn$qctype=="Diff" & jn$Result_Operator.deq=="=" & jn$Result_Operator.split!="=" 
+  #                            ~abs(jn$Result_Numeric.deq-jn$MRLValue.split), 
+  #                          jn$qctype=="Micro" & (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & 
+  #                            (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") &
+  #                            jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
+  #                            ~abs(log10(jn$Result_Numeric.deq)-log10(jn$Result_Numeric.split)),
+  #                          jn$qctype=="Micro"& (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & 
+  #                            (jn$Result_Operator.split!="="|jn$Result_Operator.split!=">") &
+  #                            jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
+  #                            ~abs(log10(jn$Result_Numeric.deq)-log10(jn$MRLValue.deq)),
+  #                          jn$qctype=="Micro"& (jn$Result_Operator.deq!="="|jn$Result_Operator.deq!=">") & 
+  #                            (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") &
+  #                            jn$Result_Numeric.deq!=0 & jn$Result_Numeric.split!=0
+  #                            ~abs(log10(jn$Result_Numeric.split)-log10(jn$MRLValue.deq)),
+  #                          jn$qctype=="Micro" &  (jn$Result_Operator.split=="="|jn$Result_Operator.split==">") & jn$Result_Numeric.deq==0
+  #                          ~abs(log10(jn$MRLValue.deq)-log10(jn$Result_Numeric.split)),
+  #                          jn$qctype=="Micro" & (jn$Result_Operator.deq=="="|jn$Result_Operator.deq==">") & jn$Result_Numeric.split==0
+  #                          ~abs(log10(jn$MRLValue.deq)-log10(jn$Result_Numeric.deq))
+  #                          )
+  
+  jn$splitDiff <- NA_real_
+  
+  jn <- jn |>
+    mutate(splitDiff = case_when(
+      qctype=="Diff" & Result_Operator.deq=="=" & Result_Operator.split=="=" ~ 
+        abs(Result_Numeric.deq-Result_Numeric.split),
+      qctype=="Diff" & Result_Operator.deq!="=" & Result_Operator.split=="=" ~
+        abs(Result_Numeric.split-MRLValue.deq),
+      qctype=="Diff" & Result_Operator.deq=="=" & Result_Operator.split!="=" ~
+        abs(Result_Numeric.deq-MRLValue.split),
+      TRUE ~ splitDiff))
+  
+  if ("Micro" %in% jn$qctype) {
+    jn <- jn |>
+      mutate(splitDiff = case_when(
+        qctype == "Micro" & (Result_Operator.deq %in% c("=",">")) & (Result_Operator.split %in% c("=",">"))
+        & Result_Numeric.deq!=0 & Result_Numeric.split!=0 ~ abs(log10(Result_Numeric.deq)-log10(Result_Numeric.split)),
+        TRUE ~ splitDiff
+      ))
+  }
                            
   #round RPD and Diff
   jn$splitDiff<-round(jn$splitDiff,digits=2)
