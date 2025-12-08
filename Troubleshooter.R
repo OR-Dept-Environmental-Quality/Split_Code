@@ -14,10 +14,10 @@ source("Unit_Convert_Function.R")
 
 
 # Enter parameters for data pull
-StDate <- '2022-11-14'
-EndDate <- '2022-11-16'
+StDate <- '2022-11-29'
+EndDate <- '2022-11-30'
 Project <- 'Landfill Monitoring'
-SplOrg <- 'LF_STJOHNS'
+spltorg <- 'LF_JOENEY'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(spltorg, 'OREGONDEQ'),
@@ -242,37 +242,40 @@ spltcomp<-param_grp(spltcomp)
     date<-unique(lstsplt[[i]]$SampleStartDate)
     time<-unique(lstsplt[[i]]$SampleStartTime.deq)
     grp<-unique(lstsplt[[i]]$param_grp)
-    
+
+  # --- Skip empty or invalid groups ---
+  if (length(grp) == 0 || all(is.na(grp))) next
+
     if (grp == "Semivolatiles") {
       lstsplt[[i]] <- lstsplt[[i]] %>%
         dplyr::filter(!str_starts(Method_Code.deq, "8260") &
                         !str_starts(Method_Code.split, "8260"))
     }
-    
+
     if (grp == "VOCs") {
       lstsplt[[i]] <- lstsplt[[i]] %>%
         dplyr::filter(!str_starts(Method_Code.deq, "8270") &
                         !str_starts(Method_Code.split, "8270"))
     }
-    
+
     #remove station, date, and time columns
     lstsplt[[i]]$MLocID<-NULL
     lstsplt[[i]]$SampleStartDate<-NULL
     lstsplt[[i]]$SampleStartTime.deq<-NULL
     lstsplt[[i]]$param_grp<-NULL
     lstsplt[[i]]$stparam<-NULL
-    
+
     #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
     #so we create MRLNum variable to use and then hide the column later
     lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
     lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
-    
+
     if (grp == "Physical Chem") {
       extra_text <- " \\newline DEQ Nitrate + Nitrite compared to Split Org Nitrate where applicable"
     } else {
       extra_text <- ""
     }
-    
+
     print(kable(lstsplt[[i]],format='html', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ",
                                                         "Split Lab","RPD","Diff","Issue"),
                 caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
@@ -287,4 +290,3 @@ spltcomp<-param_grp(spltcomp)
             row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
     )
   }
-  
