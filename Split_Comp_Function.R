@@ -11,7 +11,7 @@ splitcomp<-function(deq,splt)
   source("Unit_Convert_Function.R")
   
 #####UNITS
-#convert units so they match DEQ's data (NOTE: THIS NEEDS MORE TESTING TO MAKE SURE THE CODE WORKS PROPERLY)
+#convert units so they match DEQ's data 
 #get the units associated with the characteristics for deq and split data
 dequnit<-subset(deq,select=c("Char_Name","Result_Unit"))
 dequnit<-unique(dequnit)
