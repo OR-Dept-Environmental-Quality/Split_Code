@@ -54,6 +54,8 @@ splt<-namefrac(splt)
 
 if(any(deq$Char_Name %in% "Nitrate + Nitrite")) {splt<-splt%>% mutate(Char_Name=str_replace(Char_Name,"Nitrate","Nitrate + Nitrite"))}
 
+#do inner join if stations/dupes match, do left join if they do not
+
   #need to join datasets on an inner join
   #jn<-inner_join(deq,splt, by = c('MLocID',"SampleStartDate","Char_Name","Activity_Type"),suffix=c(".deq",".split"))
   
