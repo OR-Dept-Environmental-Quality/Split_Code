@@ -325,17 +325,18 @@ if(unique(Project)=="Effluent Monitoring")
     lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
     lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
     
-    print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+    print(kable(lstsplt[[i]],format='html', col.names=c("Analyte","DEQ","Split Lab",
+                                                        "Unit","DEQ","Split Lab","DEQ",
+                                                        "Split Lab","RPD","Diff","Issue"),
                 caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
             kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
-            add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3)%>%
+            add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3))%>%
                                column_spec(1,width="10em") %>%
                                column_spec(5:6,width="5em") %>%
                                #hide last column, don't want it shown
                                column_spec(11,width="0em",color="white") %>%
                                row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
             )
-    )
     
   }
   
