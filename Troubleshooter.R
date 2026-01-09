@@ -14,10 +14,10 @@ source("Unit_Convert_Function.R")
 
 
 # Enter parameters for data pull
-StDate <- '2022-11-29'
-EndDate <- '2022-11-30'
-Project <- 'Landfill Monitoring'
-spltorg <- 'LF_JOENEY'
+StDate <- '2025-07-30'
+EndDate <- '2025-07-31'
+Project <- 'Effluent Monitoring'
+spltorg <- 'NRSA'
 
 # Pull data from AWQMS
 All_Data <- AWQMS_Data(startdate = StDate, enddate = EndDate, OrganizationID = c(spltorg, 'OREGONDEQ'),
@@ -203,16 +203,13 @@ spltcomp<-param_grp(spltcomp)
 
 #make summary tables conditional, if WWTP split, just have the one table. If it is a landfill split, break it out into groups
 
-### "Landfill Monitoring"
-
+if(unique(spltorg$Project1)=="Landfill Monitoring")
+{
   #get subset of columns, combine characteristic name and speciation
-  spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,
-                                   Char_Speciation.deq,Result_Text.deq,Result_Text.split,
-                                   Result_Unit.deq,Method_Code.deq,Method_Code.split,
-                                   MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp)) %>% 
-    mutate(SampleStartDate = format(as.Date(SampleStartDate), format = "%m-%d-%Y"), 
-           SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), 
-                                        format = "%H:%M:%S"))%>% 
+  spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
+                                   Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue,param_grp))%>% 
+    mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+                                      "%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% 
     
     
     #changed to add param_grp
@@ -242,51 +239,105 @@ spltcomp<-param_grp(spltcomp)
     date<-unique(lstsplt[[i]]$SampleStartDate)
     time<-unique(lstsplt[[i]]$SampleStartTime.deq)
     grp<-unique(lstsplt[[i]]$param_grp)
-
-  # --- Skip empty or invalid groups ---
-  if (length(grp) == 0 || all(is.na(grp))) next
-
+    
+    if (length(grp) == 0 || all(is.na(grp))) next
+    
     if (grp == "Semivolatiles") {
       lstsplt[[i]] <- lstsplt[[i]] %>%
         dplyr::filter(!str_starts(Method_Code.deq, "8260") &
                         !str_starts(Method_Code.split, "8260"))
     }
-
+    
     if (grp == "VOCs") {
       lstsplt[[i]] <- lstsplt[[i]] %>%
         dplyr::filter(!str_starts(Method_Code.deq, "8270") &
                         !str_starts(Method_Code.split, "8270"))
     }
-
+    
     #remove station, date, and time columns
     lstsplt[[i]]$MLocID<-NULL
     lstsplt[[i]]$SampleStartDate<-NULL
     lstsplt[[i]]$SampleStartTime.deq<-NULL
     lstsplt[[i]]$param_grp<-NULL
     lstsplt[[i]]$stparam<-NULL
-
+    
     #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
     #so we create MRLNum variable to use and then hide the column later
     lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
     lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
-
-    if (grp == "Physical Chem") {
-      extra_text <- " \\newline DEQ Nitrate + Nitrite compared to Split Org Nitrate where applicable"
-    } else {
-      extra_text <- ""
-    }
-
-    print(kable(lstsplt[[i]],format='html', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ",
-                                                        "Split Lab","RPD","Diff","Issue"),
-                caption=paste(station,',',date,',',time,grp),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+    
+    print(kable(lstsplt[[i]],format='latex', col.names=c("Analyte","DEQ","Split Lab","Unit","DEQ","Split Lab","DEQ","Split Lab","RPD","Diff","Issue"),
+                caption=paste(station,',',date,',',time,grp, 
+                              ifelse(grp == "Physical Chem", "***DEQ Nitrate+Nitrite compared to Split Lab Nitrate, when applicable***",
+                                     "")),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
             kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
             add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3))%>%
-            column_spec(1,width="7em") %>%
-            column_spec(2:3,width="3em")%>%
-            column_spec(5:6,width="7em") %>%
-            column_spec(7:8,width="3em")%>%
+            column_spec(1,width="10em") %>%
+            column_spec(5:6,width="5em") %>%
             #hide last column, don't want it shown
             column_spec(11,width="0em",color="white") %>%
             row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
     )
   }
+  
+}
+
+if(unique(Project)=="Effluent Monitoring")
+{
+  #get subset of columns, combine characteristic name and speciation, and remove the speciation column
+  spltrp<-subset(spltcomp,select=c(MLocID,SampleStartDate,SampleStartTime.deq,Char_Name,Char_Speciation.deq,Result_Text.deq,Result_Text.split,
+                                   Result_Unit.deq,Method_Code.deq,Method_Code.split,MRLValue.deq,MRLValue.split,splitRPD,splitDiff,issue))%>% mutate(SampleStartDate = format(as.Date(SampleStartDate), format =
+                                                                                                                                                                                 "%m-%d-%Y"), SampleStartTime.deq = format(as.POSIXct(SampleStartTime.deq, format = "%H:%M:%OS"), format = "%H:%M:%S"))%>% mutate(Char_Name=paste(Char_Name,' ',ifelse(is.na(Char_Speciation.deq),' ',Char_Speciation.deq))) %>%
+    select(-Char_Speciation.deq)
+  
+  #make split lab LOQ 'NR' if not reported
+  spltrp$MRLValue.split<-ifelse(is.na(spltrp$MRLValue.split),"NR",spltrp$MRLValue.split)
+  
+  #reformat date
+  spltrp$SampleStartDate<-format(spltrp$SampleStartDate,format="%m-%d-%Y")
+  
+  #change name of "Biochemical oxygen demand, standard conditions" to "BOD-5"
+  spltrp<-spltrp%>%
+    mutate(Char_Name=str_replace(Char_Name,"Biochemical oxygen demand, standard conditions","BOD-5"))%>%
+    mutate(Char_Name=str_replace(Char_Name,"Total suspended solids","TSS"))%>%
+    mutate(Char_Name=str_replace(Char_Name,"Chemical oxygen demand","COD"))%>%
+    mutate(Char_Name=str_replace(Char_Name,"Hardness, Ca, Mg, Total Recoverable","Hardness"))
+  
+  #this table is huge and unwieldy, try splitting it down by station/date/time
+  spltrp$stdttm<-paste0(spltrp$MLocID,spltrp$SampleStartDate, spltrp$SampleStartTime.deq)
+  lstsplt<-split(spltrp,spltrp$stdttm)
+  
+  for (i in 1:length(lstsplt)){
+    #get station, date, and time as variables so we can put them in the table name
+    station<-unique(lstsplt[[i]]$MLocID)
+    date<-unique(lstsplt[[i]]$SampleStartDate)
+    time<-unique(lstsplt[[i]]$SampleStartTime.deq)
+    stdttm<-unique(lstsplt[[i]]$stdttm)
+    
+    #remove station, date, and time columns
+    lstsplt[[i]]$MLocID<-NULL
+    lstsplt[[i]]$SampleStartDate<-NULL
+    lstsplt[[i]]$SampleStartTime.deq<-NULL
+    lstsplt[[i]]$stdttm<-NULL
+    
+    #need to convert MRLs to character so we don't get a bunch of trailing zeroes (sig figs important), but need to calculate QC criteria
+    #so we create MRLNum variable to use and then hide the column later
+    lstsplt[[i]]$MRLValue.split<-as.character(lstsplt[[i]]$MRLValue.split)
+    lstsplt[[i]]$MRLValue.deq<-as.character(lstsplt[[i]]$MRLValue.deq)
+    
+    print(kable(lstsplt[[i]],format='html', col.names=c("Analyte","DEQ","Split Lab",
+                                                        "Unit","DEQ","Split Lab","DEQ",
+                                                        "Split Lab","RPD","Diff","Issue"),
+                caption=paste(station,',',date,',',time),booktabs=TRUE,row.names=FALSE,longtable=TRUE)%>%
+            kable_styling(latex_options=c("HOLD_position","striped","repeat_header"),font_size=9)%>%
+            add_header_above(c(" "=1,"Result"=2," "=1,"Method"=2,"LOQ"=2, " "=3))%>%
+                               column_spec(1,width="10em") %>%
+                               column_spec(5:6,width="5em") %>%
+                               #hide last column, don't want it shown
+                               column_spec(11,width="0em",color="white") %>%
+                               row_spec(which(lstsplt[[i]]$issue=="TRUE"),bold=TRUE)
+            )
+    
+  }
+  
+}
